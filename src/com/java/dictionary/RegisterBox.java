@@ -4,6 +4,11 @@ import javafx.stage.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
 import javafx.geometry.*;
 
 public class RegisterBox {
@@ -59,6 +64,17 @@ public class RegisterBox {
 		
 		/**Set parent window unanswered*/
 		Scene sceneSignup = new Scene(paneSignup); 
+		String path = System.getProperty("user.dir").replace("\\", "/");
+		File fileCss = new File(path.concat("/dark.css"));	
+		InputStream is = null;
+		try {
+			is = new FileInputStream(fileCss);
+			sceneSignup.getStylesheets().add(fileCss.toURL().toExternalForm());
+			is.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		stgSignup.setScene(sceneSignup); 
 		//stgSignup.show();
 		stgSignup.showAndWait();

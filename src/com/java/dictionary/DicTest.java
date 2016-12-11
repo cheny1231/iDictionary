@@ -111,7 +111,8 @@ public class DicTest {
 	private static void setDataBD(String str) {
 		//text.append(str).append("\n");
 		BDtext.setText(str);
-		//System.out.println(text.toString());
+		BDtext.appendText("\n\n————百度翻译");
+		
 	}
 	
 	private static void setDataBY(String str) {
@@ -120,11 +121,13 @@ public class DicTest {
 		BYtext.setText(strs[0]+"\n");
 		for(int i = 1; i < strs.length; i++)
 			BYtext.appendText(strs[i]+"\n");
+		BYtext.appendText("\n————必应翻译");
 	}
 	
 	private static void setDataYD(String str) {
 		//text.append(str).append("\n");
 		YDtext.setText(str);
+		YDtext.appendText("\n\n————有道翻译");
 	}
 
 	public static void setBDtext(TextArea bDtext) {

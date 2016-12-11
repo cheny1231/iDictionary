@@ -45,4 +45,6 @@ public class NetStatus {
         }   
         return connect;  
     } 
+    
+    
 }

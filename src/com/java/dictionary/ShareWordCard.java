@@ -3,6 +3,8 @@ package com.java.dictionary;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.Vector;
+
 import javax.imageio.ImageIO;
 
 import javafx.collections.ObservableList;
@@ -18,8 +20,13 @@ public class ShareWordCard {
 	public void alphaWords2Image(String word, String translation, String type) throws IOException {
 		FileOutputStream fos = null;
 		try {
-			String[] trans = translation.split("\n");
-			image = ImageIO.read(new File("D:\\WordCard.png"));
+			Vector<String> trans = new Vector<String>();
+			for(int i = 0; i < translation.length()/20; i++){
+				trans.addElement(translation.substring(i*20, i*20+20));
+			}
+			trans.addElement(translation.substring(translation.length()/20*20));
+			String path = System.getProperty("user.dir").replace("\\", "/");
+			image = ImageIO.read(new File(path.concat("/images/WordCard.png")));
 			// 创建java2D对象
 			Graphics2D g2d = image.createGraphics();
 			// 用源图像填充背景
@@ -31,13 +38,14 @@ public class ShareWordCard {
 			g2d.setFont(new Font("TimesRoman", Font.BOLD, 40));
 			g2d.setColor(Color.BLACK);// 设置字体颜色
 			g2d.drawString(word, 173, 100); // 输入水印文字及其起始x、y坐标
+			
 			g2d.setFont(new Font("宋体", Font.PLAIN, 26));
-			for(int i = 0; i < trans.length; i++){
-				g2d.drawString(trans[i], 30, i*40+150);
+			for(int i = 0; i < trans.size(); i++){
+				g2d.drawString(trans.get(i), 30, i*40+150);
 			}
-			g2d.drawString(type, 300, 500);
+			g2d.drawString(type, 300, 550);
 			g2d.dispose();
-			fos = new FileOutputStream("D:\\WordCard1.png");
+			fos = new FileOutputStream(path.concat("/images/WordCard1.png"));
 			ImageIO.write(image, "png", fos);
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -6,6 +6,11 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.*;
 import javafx.geometry.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
 import javafx.beans.value.*;
 import javafx.collections.*; 
 
@@ -52,12 +57,13 @@ public class ShareCardBox {
 		Button btnShare = new Button("Share!");
 		paneShareCard.setBottom(btnShare);
 		BorderPane.setAlignment(btnShare, Pos.CENTER);
-		btnShare.setPrefSize(80, 40);
+		btnShare.setPrefSize(100, 40);
 		btnShare.setFont(Font.font("TimesRoman", 18));
+		String[] translations = translation.split("！！！！");
 		btnShare.setOnAction(event->{		
 			usersShared = list.getSelectionModel().getSelectedItems();
 			try {
-				new ShareWordCard(usersShared).alphaWords2Image(word, translation, type);
+				new ShareWordCard(usersShared).alphaWords2Image(word, translations[0], type);
 				//To do send message to the server
 				//if succeed
 				new DialogueBox().displayShareSuccess();
@@ -70,6 +76,17 @@ public class ShareCardBox {
 		
 		/**Set parent window unanswered*/
 		Scene sceneShareCard = new Scene(paneShareCard,300,360); 
+		InputStream is = null;
+		String path = System.getProperty("user.dir").replace("\\", "/");
+		File fileCss = new File(path.concat("/dark.css"));	
+		try {
+			is = new FileInputStream(fileCss);
+			sceneShareCard.getStylesheets().add(fileCss.toURL().toExternalForm());
+			is.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		paneShareCard.prefHeightProperty().bind(sceneShareCard.heightProperty()) ;
 		paneShareCard.prefWidthProperty().bind(sceneShareCard.widthProperty()) ;
 		stgShareCard.setScene(sceneShareCard); 
