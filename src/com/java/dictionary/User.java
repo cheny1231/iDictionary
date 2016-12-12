@@ -1,9 +1,14 @@
 package com.java.dictionary;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class User {
+public class User implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static User INSTANCE = null;
 	private String username;
 	private String password;
