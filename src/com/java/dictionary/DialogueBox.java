@@ -17,40 +17,40 @@ public class DialogueBox {
 	
 	InputStream is = null;
 	
-	public void displayShareSuccess(){
-		VBox paneShareSuccess = new VBox(10); 		
-		Stage stgShareSuccess=new Stage();  
-		stgShareSuccess.initModality(Modality.APPLICATION_MODAL);
+	public void displayAlertBox(String alertWords){
+		VBox paneAlertBox = new VBox(10); 		
+		Stage stgAlertBox=new Stage();  
+		stgAlertBox.initModality(Modality.APPLICATION_MODAL);
 //		paneShareSuccess.setPadding(new Insets(5, 5, 5, 5));  
-		paneShareSuccess.setPrefSize(300, 80);
+		paneAlertBox.setPrefSize(300, 80);
 		
 		
 		/**Set the Labels*/
-		Label success = new Label("Your friends have received the Word Card!");
-		paneShareSuccess.getChildren().add(success);
+		Label success = new Label(alertWords);
+		paneAlertBox.getChildren().add(success);
 		
 		/**Set the Button*/
 		Button btnOK = new Button("OK");
 		btnOK.setOnAction(event->{
-			stgShareSuccess.close();						
+			stgAlertBox.close();						
 	});	
-		paneShareSuccess.getChildren().add(btnOK);
+		paneAlertBox.getChildren().add(btnOK);
 		
 		/**Set parent window unanswered*/
-		paneShareSuccess.setAlignment(Pos.CENTER);
-		Scene sceneShareSuccess = new Scene(paneShareSuccess); 
+		paneAlertBox.setAlignment(Pos.CENTER);
+		Scene sceneAlertBox = new Scene(paneAlertBox); 
 		String path = System.getProperty("user.dir").replace("\\", "/");
 		File fileCss = new File(path.concat("/dark.css"));		
 		try {
 			is = new FileInputStream(fileCss);
-			sceneShareSuccess.getStylesheets().add(fileCss.toURL().toExternalForm());
+			sceneAlertBox.getStylesheets().add(fileCss.toURL().toExternalForm());
 			is.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		stgShareSuccess.setScene(sceneShareSuccess); 
-		stgShareSuccess.showAndWait();
+		stgAlertBox.setScene(sceneAlertBox); 
+		stgAlertBox.showAndWait();
 		
 	}
 	

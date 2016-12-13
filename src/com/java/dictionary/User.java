@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class User implements Serializable{
+public class User implements Serializable {
 	/**
 	 * 
 	 */
@@ -40,6 +40,17 @@ public class User implements Serializable{
 		return password;
 	}
 
+	public void addFavors(boolean flag, String type) {
+		int temp = this.favors.get(type);
+		if (flag)
+			temp++;
+		else {
+			if (temp > 0)
+				temp--;
+		}
+		this.favors.replace(type, temp);
+	}
+
 	public void setFavors(Map<String, Integer> favors) {
 		this.favors = favors;
 	}
@@ -50,6 +61,21 @@ public class User implements Serializable{
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String[] sort() {
+		String[] sortResult = { "BD", "BY", "YD" };
+		String temp;
+		for (int i = 0; i < 2; i++) {
+			for (int j = i + 1; j < 3; j++) {
+				if (favors.get(sortResult[i]) < favors.get(sortResult[j])) {
+					temp = sortResult[i];
+					sortResult[i] = sortResult[j];
+					sortResult[j] = temp;
+				}
+			}
+		}
+		return sortResult;
 	}
 
 }

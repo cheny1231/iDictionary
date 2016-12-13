@@ -1,23 +1,18 @@
 package com.java.dictionary;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-
 import javafx.scene.control.TextArea;
 
 public class DicTest {
 	Translate tlBY;
 	Translate tlYD;
 	Translate tlBD;
-	static TextArea BDtext;
-	static TextArea BYtext;
-	static TextArea YDtext;
+	TextArea BDtext;
+	TextArea BYtext;
+	TextArea YDtext;
 	static String qName;
 	/**
 	 * 多个词典查询的时候使用多线程，StringBuffer较StringBuilder多线程安全，使用StringBuffer
@@ -108,14 +103,14 @@ public class DicTest {
 		tlYD.getTransResult();
 	}
 
-	private static void setDataBD(String str) {
+	private void setDataBD(String str) {
 		//text.append(str).append("\n");
 		BDtext.setText(str);
 		BDtext.appendText("\n\n————百度翻译");
 		
 	}
 	
-	private static void setDataBY(String str) {
+	private void setDataBY(String str) {
 		//text.append(str).append("\n");
 		String[] strs = str.split("     ");
 		BYtext.setText(strs[0]+"\n");
@@ -124,21 +119,34 @@ public class DicTest {
 		BYtext.appendText("\n————必应翻译");
 	}
 	
-	private static void setDataYD(String str) {
+	private void setDataYD(String str) {
 		//text.append(str).append("\n");
 		YDtext.setText(str);
 		YDtext.appendText("\n\n————有道翻译");
 	}
 
-	public static void setBDtext(TextArea bDtext) {
+	public void setBDtext(TextArea bDtext) {
 		BDtext = bDtext;
 	}
 
-	public static void setBYtext(TextArea bYtext) {
+	public void setBYtext(TextArea bYtext) {
 		BYtext = bYtext;
 	}
 
-	public static void setYDtext(TextArea yDtext) {
+	public void setYDtext(TextArea yDtext) {
 		YDtext = yDtext;
 	}
+
+	public TextArea getBDtext() {
+		return BDtext;
+	}
+
+	public TextArea getBYtext() {
+		return BYtext;
+	}
+
+	public TextArea getYDtext() {
+		return YDtext;
+	}
+	
 }
