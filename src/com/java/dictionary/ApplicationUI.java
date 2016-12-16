@@ -2,7 +2,10 @@ package com.java.dictionary;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -18,20 +21,20 @@ import javafx.geometry.*;
 import javafx.beans.binding.Bindings;
 
 public class ApplicationUI extends Application {
-	// static ClientSocket clientSocket;
 	static User user;
 	static DicTest dicTest;
 	static NetStatus netStatus;
+	static Socket server;
 	Vector<TextArea> text;
 	TextArea text1;
 	TextArea text2;
 	TextArea text3;
 	String[] sortResult;
 	Vector<ToggleButton> btnFavor = new Vector<ToggleButton>();
-	long start = 0;
+	Object object;
+//	long start = 0;
 
 	public void start(Stage primaryStage) throws Exception {
-
 		/* Initialize variables */
 		DialogueBox dialogueBox = new DialogueBox();
 		ToggleButton btnFavorBD = new ToggleButton();
@@ -83,7 +86,7 @@ public class ApplicationUI extends Application {
 				DicTest.setqName(inputWord.getText());
 				btnFavorBD.setSelected(false);
 				btnFavorBY.setSelected(false);
-				btnFavorYD.setSelected(false);			
+				btnFavorYD.setSelected(false);
 				// if (!netStatus.isConnect()) {
 				// new DialogueBox().displayNetUnconnected();
 				// } else {
@@ -151,6 +154,14 @@ public class ApplicationUI extends Application {
 		btnLogout.setVisible(false);
 		btnLogout.setOnAction(event -> {
 			// TODO send the user to server
+			try {
+				user.setType("Logout");
+				DicTest.getEs().execute(new ClientSocketSend<User>(user, server));
+				server.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			user.setFavors(null);
 			user.setPassword(null);
 			user.setUsername(null);
@@ -162,7 +173,7 @@ public class ApplicationUI extends Application {
 		pane.add(btnSign, 4, 0, 1, 1);
 		RegisterBox registerBox = new RegisterBox();
 		btnSign.setOnAction(event -> {
-			registerBox.display(user);
+			registerBox.display(user, server);
 			if (user.getUsername() != null && user.getPassword() != null) {
 				labelForUser.setText(user.getUsername());
 				btnSign.setVisible(false);
@@ -179,7 +190,7 @@ public class ApplicationUI extends Application {
 			if (user.getUsername() == null)
 				dialogueBox.displayAlertBox("Please Log in first!");
 			else if (DicTest.getqName() != null && text.get(0).getText() != null)
-				shareCardBox.display(DicTest.getqName(), text.get(0).getText(), user.getUsername());
+				shareCardBox.display(DicTest.getqName(), text.get(0).getText(), user.getUsername(), server);
 		});
 
 		/* Set Button for Sharing Text2 Word Card */
@@ -189,7 +200,7 @@ public class ApplicationUI extends Application {
 			if (user.getUsername() == null)
 				dialogueBox.displayAlertBox("Please Log in first!");
 			else if (DicTest.getqName() != null && text.get(1).getText() != null)
-				shareCardBox.display(DicTest.getqName(), text.get(1).getText(), user.getUsername());
+				shareCardBox.display(DicTest.getqName(), text.get(1).getText(), user.getUsername(), server);
 		});
 
 		/* Set Button for Sharing Text3 Word Card */
@@ -199,7 +210,7 @@ public class ApplicationUI extends Application {
 			if (user.getUsername() == null)
 				dialogueBox.displayAlertBox("Please Log in first!");
 			else if (DicTest.getqName() != null && text.get(2).getText() != null)
-				shareCardBox.display(DicTest.getqName(), text.get(2).getText(), user.getUsername());
+				shareCardBox.display(DicTest.getqName(), text.get(2).getText(), user.getUsername(), server);
 		});
 
 		/* Set Button for favors */
@@ -241,26 +252,6 @@ public class ApplicationUI extends Application {
 			});
 		}
 
-		// Bing
-
-		// Youdao
-		//
-		// btnFavorYD.setStyle("-fx-background-color: transparent");
-		// heartViewYD.imageProperty()
-		// .bind(Bindings.when(btnFavorYD.selectedProperty()).then(HeartPadded).otherwise(HeartEmpty));
-		// pane.add(btnFavorYD, 4, 9, 1, 1);
-		// btnFavorYD.setOnAction(event -> {
-		// if (user.getUsername() == null) {
-		// dialogueBox.displayAlertBox("Please Log in first!");
-		// btnFavorYD.setSelected(false);
-		// } else {
-		// if (btnFavorYD.isSelected())
-		// user.addFavors(true, "YD");
-		// else
-		// user.addFavors(false, "YD");
-		// }
-		// });
-
 		/* Set Scene */
 		Scene scene = new Scene(pane, 500, 500);
 		File fileCss = new File(path.concat("/dark.css"));
@@ -274,10 +265,18 @@ public class ApplicationUI extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("iDictionary");
 		primaryStage.show();
+
+	}
+
+	public static Socket getServer() {
+		return server;
+	}
+
+	public static void setServer(Socket server) {
+		ApplicationUI.server = server;
 	}
 
 	public static void main(String[] args) {
-		// clientSocket = new ClientSocket();
 		user = User.getInstance();
 		dicTest = new DicTest();
 		netStatus = new NetStatus();

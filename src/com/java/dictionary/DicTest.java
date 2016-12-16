@@ -2,6 +2,7 @@ package com.java.dictionary;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javafx.scene.control.TextArea;
@@ -13,17 +14,18 @@ public class DicTest {
 	TextArea BDtext;
 	TextArea BYtext;
 	TextArea YDtext;
+	static ExecutorService es;
 	static String qName;
 	/**
 	 * 多个词典查询的时候使用多线程，StringBuffer较StringBuilder多线程安全，使用StringBuffer
 	 */
 	static StringBuffer text = new StringBuffer();
-	public DicTest(){
-	//public static void main(String[] args) {
+
+	public DicTest() {
 		/**
 		 * 1、创建size为3的线程池
 		 */
-		ExecutorService es = Executors.newFixedThreadPool(3);
+		es = Executors.newFixedThreadPool(5);
 
 		/**
 		 * 2、通过工厂方法，获取词典翻译的对象
@@ -31,8 +33,7 @@ public class DicTest {
 		tlBY = TransFactory.getTranslate(Translate.BY);
 		tlYD = TransFactory.getTranslate(Translate.YD);
 		tlBD = TransFactory.getTranslate(Translate.BD);
-       
-		
+
 		/**
 		 * 3、每类词典设置参数，初始化的时候设置即可
 		 */
@@ -76,51 +77,55 @@ public class DicTest {
 		});
 
 	}
-	
-	public static void setqName(String str){
+
+	static public ExecutorService getEs() {
+		return es;
+	}
+
+	public static void setqName(String str) {
 		qName = str;
 	}
-	
-	public static String getqName(){
+
+	public static String getqName() {
 		return qName;
 	}
-	
+
 	/**
 	 * 4、运行翻译
 	 */
-	public void transBD(){
+	public void transBD() {
 		Translate tlBD = TransFactory.getTranslate(Translate.BD);
 		tlBD.getTransResult();
 	}
-	
-	public void transBY(){
+
+	public void transBY() {
 		Translate tlBY = TransFactory.getTranslate(Translate.BY);
 		tlBY.getTransResult();
 	}
-	
-	public void transYD(){
+
+	public void transYD() {
 		Translate tlYD = TransFactory.getTranslate(Translate.YD);
 		tlYD.getTransResult();
 	}
 
 	private void setDataBD(String str) {
-		//text.append(str).append("\n");
+		// text.append(str).append("\n");
 		BDtext.setText(str);
 		BDtext.appendText("\n\n————百度翻译");
-		
+
 	}
-	
+
 	private void setDataBY(String str) {
-		//text.append(str).append("\n");
+		// text.append(str).append("\n");
 		String[] strs = str.split("     ");
-		BYtext.setText(strs[0]+"\n");
-		for(int i = 1; i < strs.length; i++)
-			BYtext.appendText(strs[i]+"\n");
+		BYtext.setText(strs[0] + "\n");
+		for (int i = 1; i < strs.length; i++)
+			BYtext.appendText(strs[i] + "\n");
 		BYtext.appendText("\n————必应翻译");
 	}
-	
+
 	private void setDataYD(String str) {
-		//text.append(str).append("\n");
+		// text.append(str).append("\n");
 		YDtext.setText(str);
 		YDtext.appendText("\n\n————有道翻译");
 	}
@@ -148,5 +153,6 @@ public class DicTest {
 	public TextArea getYDtext() {
 		return YDtext;
 	}
-	
+
+
 }

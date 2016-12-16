@@ -10,6 +10,7 @@ import javafx.geometry.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.Socket;
 
 import javafx.beans.value.*;
 import javafx.collections.*;
@@ -20,7 +21,8 @@ public class ShareCardBox {
 	// static DialogueBox dialogueBox;
 	ObservableList<String> usersShared;
 
-	public void display(String word, String translation, String username) {
+	@SuppressWarnings("unchecked")
+	public void display(String word, String translation, String username, Socket server) {
 		/** Set Sign up Window */
 		BorderPane paneShareCard = new BorderPane();
 		Stage stgShareCard = new Stage();
@@ -41,8 +43,25 @@ public class ShareCardBox {
 
 		/** Set the List */
 		ListView<String> list = new ListView<>();
+		ObservableList<String> items = null;
+		DicTest.getEs().execute(new ClientSocketSend<String>("ListOfOnlineUser",server));
+		while(ClientSocketReceive.getMessage() != ""){
+			if(ClientSocketReceive.getMessage() == "online user"){
+				items = (ObservableList<String>)ClientSocketReceive.getObject();
+				ClientSocketReceive.setMessage("");
+				ClientSocketReceive.setObject(null);
+				DicTest.getEs().execute(new ClientSocketSend<String>("ACK",server));
+			}
+			else {
+				ClientSocketReceive.setMessage("");
+				ClientSocketReceive.setObject(null);
+				DicTest.getEs().execute(new ClientSocketSend<String>("ACK",server));
+				new DialogueBox().displayAlertBox("Unaccessible to user list!");
+				stgShareCard.close();				
+			}
+		}
 		// TODO receive the on-line user list from the server
-		ObservableList<String> items = FXCollections.observableArrayList("Single", "Double", "Suite", "Family App");
+//		ObservableList<String> items = FXCollections.observableArrayList("Single", "Double", "Suite", "Family App");
 		list.setItems(items);
 		
 		list.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -74,15 +93,29 @@ public class ShareCardBox {
 		btnShare.setOnAction(event -> {
 			usersShared = list.getSelectionModel().getSelectedItems();
 			try {
-				new ShareWordCard(usersShared, username).alphaWords2Image(word, translations[0], translations[1]);
+				ShareWordCard shareWordCard = new ShareWordCard(usersShared, username);
+				shareWordCard.alphaWords2Image(word, translations[0], translations[1]);
 				// TODO send message to the server
 				// if succeed
-				new DialogueBox().displayAlertBox("Your friends have received the Word Card!");
+				DicTest.getEs().execute(new ClientSocketSend<ShareWordCard>(shareWordCard,server));
+				while(ClientSocketReceive.getMessage() != ""){
+					if(ClientSocketReceive.getMessage() == "WordCardShared"){
+						ClientSocketReceive.setMessage("");
+						DicTest.getEs().execute(new ClientSocketSend<String>("ACK",server));
+						new DialogueBox().displayAlertBox("Your friends have received the Word Card!");		
+						stgShareCard.close();
+					}
+					else{
+						ClientSocketReceive.setMessage("");
+						DicTest.getEs().execute(new ClientSocketSend<String>("ACK",server));
+						new DialogueBox().displayAlertBox("Error!");
+						stgShareCard.close();
+					}
+				}
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			stgShareCard.close();
+			
 		});
 
 		/** Set parent window unanswered */
@@ -95,7 +128,6 @@ public class ShareCardBox {
 			sceneShareCard.getStylesheets().add(fileCss.toURL().toExternalForm());
 			is.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		paneShareCard.prefHeightProperty().bind(sceneShareCard.heightProperty());

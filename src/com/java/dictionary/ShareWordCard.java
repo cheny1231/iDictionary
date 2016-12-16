@@ -6,10 +6,15 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 
 import javax.imageio.ImageIO;
-
+import javafx.scene.image.*;
+import javafx.scene.image.Image;
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
-public class ShareWordCard implements Serializable{
+public class ShareWordCard implements Serializable {
 
 	/**
 	 * 
@@ -25,7 +30,7 @@ public class ShareWordCard implements Serializable{
 	}
 
 	public void alphaWords2Image(String word, String translation, String type) throws IOException {
-		FileOutputStream fos = null;
+		// FileOutputStream fos = null;
 		try {
 			String path = System.getProperty("user.dir").replace("\\", "/");
 			image = ImageIO.read(new File(path.concat("/images/WordCard.png")));
@@ -37,10 +42,12 @@ public class ShareWordCard implements Serializable{
 			AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1);
 			g2d.setComposite(ac);
 			// set the text
-			g2d.setFont(new Font("TimesRoman", Font.BOLD, 40));// set the font of title word
+			g2d.setFont(new Font("TimesRoman", Font.BOLD, 40));// set the font
+																// of title word
 			g2d.setColor(Color.BLACK);
 			g2d.drawString(word, 173, 100); // write the word
-			g2d.setFont(new Font("ËÎÌו", Font.PLAIN, 26));// set the font of translation
+			g2d.setFont(new Font("ËÎÌו", Font.PLAIN, 26));// set the font of
+														// translation
 			int x = 30;
 			int y = 150;
 			for (int i = 0; i < translation.length() - 1; i++) {
@@ -60,14 +67,48 @@ public class ShareWordCard implements Serializable{
 			}
 			g2d.drawString(type, 300, 550);
 			g2d.dispose();
-			fos = new FileOutputStream(path.concat("/images/WordCard1.png"));
-			ImageIO.write(image, "png", fos);
+			// fos = new FileOutputStream(path.concat("/images/WordCard1.png"));
+			// ImageIO.write(image, "png", fos);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (fos != null) {
-				fos.close();
-			}
+			// if (fos != null) {
+			// fos.close();
+			// }
 		}
+	}
+
+	public void write2File() {
+		try {
+			FileOutputStream fos = null;
+			String path = System.getProperty("user.dir").replace("\\", "/");
+			fos = new FileOutputStream(path.concat("/images/WordCard1.png"));
+			ImageIO.write(image, "png", fos);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public void showImageCard() {
+		try {
+			InputStream is = null;
+			String path = System.getProperty("user.dir").replace("\\", "/");
+			VBox paneImage = new VBox(10);
+			Stage stgImage = new Stage();
+			stgImage.initModality(Modality.APPLICATION_MODAL);
+			paneImage.setPrefSize(100, 300);
+			File fileEmpty = new File(path.concat("/images/WordCard1.png"));
+			is = new FileInputStream(fileEmpty);
+			ImageView imageView = new ImageView(new Image(is));
+			paneImage.getChildren().add(imageView);
+			Scene sceneImage = new Scene(paneImage);
+			stgImage.setScene(sceneImage);
+			stgImage.showAndWait();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
 	}
 }

@@ -1,0 +1,29 @@
+[33mcommit cae0b4bf2714d8cc745cc75afb15867a92b3bbd5[m
+Author: cheny1231 <chenyang1231nju@gmail.com>
+Date:   Tue Dec 13 11:48:18 2016 +0800
+
+    sort by favors
+
+[33mcommit 6062925f3f0ec088f5c22118769c587db42c96be[m
+Author: cheny1231 <chenyang1231nju@gmail.com>
+Date:   Mon Dec 12 13:22:20 2016 +0800
+
+    socket & word card
+
+[33mcommit 7219239bf4969fdfe9bcbe93f2c4795c89ca1623[m
+Author: cheny1231 <chenyang1231nju@gmail.com>
+Date:   Sun Dec 11 23:52:56 2016 +0800
+
+    UI
+
+[33mcommit b80837719b6b7fb5cc4053b30936347d954c5450[m
+Author: cheny1231 <chenyang1231nju@gmail.com>
+Date:   Thu Dec 8 14:27:21 2016 +0800
+
+    Favors & Internet Check
+
+[33mcommit 807cb478c79c2aa573fdc2978e64c6650933d5a4[m
+Author: cheny1231 <chenyang1231nju@gmail.com>
+Date:   Wed Dec 7 21:35:22 2016 +0800
+
+    Search word, login & logout, Share Word

@@ -10,6 +10,11 @@ public class User implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	private static User INSTANCE = null;
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	private String type;
 	private String username;
 	private String password;
 	Map<String, Integer> favors;
