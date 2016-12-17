@@ -35,6 +35,7 @@ public class ApplicationUI extends Application {
 //	long start = 0;
 
 	public void start(Stage primaryStage) throws Exception {
+		
 		/* Initialize variables */
 		DialogueBox dialogueBox = new DialogueBox();
 		ToggleButton btnFavorBD = new ToggleButton();
@@ -107,6 +108,9 @@ public class ApplicationUI extends Application {
 						}
 					}
 				}
+				user.setType("Update");
+				System.out.println(user.getFavors().get("YD"));
+				DicTest.getEs().execute(new ClientSocketSend<User>(user,server));
 				if (checkBD.isSelected())
 					dicTest.transBD();
 				else
@@ -157,9 +161,9 @@ public class ApplicationUI extends Application {
 			try {
 				user.setType("Logout");
 				DicTest.getEs().execute(new ClientSocketSend<User>(user, server));
-				server.close();
+//				server.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+//				 TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			user.setFavors(null);
@@ -173,13 +177,22 @@ public class ApplicationUI extends Application {
 		pane.add(btnSign, 4, 0, 1, 1);
 		RegisterBox registerBox = new RegisterBox();
 		btnSign.setOnAction(event -> {
-			registerBox.display(user, server);
-			if (user.getUsername() != null && user.getPassword() != null) {
-				labelForUser.setText(user.getUsername());
-				btnSign.setVisible(false);
-				labelForUser.setVisible(true);
-				btnLogout.setVisible(true);
-			}
+			try {
+				server = new Socket("172.28.173.38", 12345);
+				DicTest.getEs().execute(new ClientSocketReceive(server));
+				registerBox.display(user, server);
+				if (user.getUsername() != null && user.getPassword() != null) {
+					labelForUser.setText(user.getUsername());
+					btnSign.setVisible(false);
+					labelForUser.setVisible(true);
+					btnLogout.setVisible(true);
+				}
+				else
+					server.close();
+			} catch (Exception e) {
+				new DialogueBox().displayNetUnconnected();
+				e.printStackTrace();
+				}
 		});
 
 		/* Set Button for Sharing Text1 Word Card */
@@ -265,6 +278,9 @@ public class ApplicationUI extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("iDictionary");
 		primaryStage.show();
+		
+		/*Open socket*/
+
 
 	}
 

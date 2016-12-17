@@ -10,13 +10,11 @@ public class User implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	private static User INSTANCE = null;
-	public void setType(String type) {
-		this.type = type;
-	}
+	
 
-	private String type;
 	private String username;
 	private String password;
+	private String type;
 	Map<String, Integer> favors;
 
 	private User() {
@@ -46,7 +44,7 @@ public class User implements Serializable {
 	}
 
 	public void addFavors(boolean flag, String type) {
-		int temp = this.favors.get(type);
+		int temp = Integer.valueOf(String.valueOf(this.favors.get(type)));
 		if (flag)
 			temp++;
 		else {
@@ -83,4 +81,7 @@ public class User implements Serializable {
 		return sortResult;
 	}
 
+	public void setType(String type) {
+		this.type = type;
+	}
 }

@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.Socket;
+import java.util.Vector;
 
 import javafx.beans.value.*;
 import javafx.collections.*;
@@ -43,27 +44,36 @@ public class ShareCardBox {
 
 		/** Set the List */
 		ListView<String> list = new ListView<>();
-		ObservableList<String> items = null;
-		DicTest.getEs().execute(new ClientSocketSend<String>("ListOfOnlineUser",server));
-		while(ClientSocketReceive.getMessage() != ""){
-			if(ClientSocketReceive.getMessage() == "online user"){
-				items = (ObservableList<String>)ClientSocketReceive.getObject();
-				ClientSocketReceive.setMessage("");
-				ClientSocketReceive.setObject(null);
-				DicTest.getEs().execute(new ClientSocketSend<String>("ACK",server));
-			}
-			else {
-				ClientSocketReceive.setMessage("");
-				ClientSocketReceive.setObject(null);
-				DicTest.getEs().execute(new ClientSocketSend<String>("ACK",server));
-				new DialogueBox().displayAlertBox("Unaccessible to user list!");
-				stgShareCard.close();				
-			}
+		ObservableList<String> items = FXCollections.observableArrayList();
+		DicTest.getEs().execute(new ClientSocketSend<String>("ListOfOnlineUser", server));
+		while (true) {
+			if (!ClientSocketReceive.getMessage().equals("")) {
+				if (ClientSocketReceive.getMessage().equals("online user")) {
+					Vector<String> usernames = (Vector<String>) ClientSocketReceive.getObject();
+					for(String i: usernames){
+						items.add(i);
+					}
+					ClientSocketReceive.setMessage("");
+					ClientSocketReceive.setObject(null);
+					DicTest.getEs().execute(new ClientSocketSend<String>("ACK", server));
+					break;
+				} else {
+					ClientSocketReceive.setMessage("");
+					ClientSocketReceive.setObject(null);
+					DicTest.getEs().execute(new ClientSocketSend<String>("ACK", server));
+					new DialogueBox().displayAlertBox("Unaccessible to user list!");
+					stgShareCard.close();
+					break;
+				}
+			} else
+				System.out.println("ListNothing");
 		}
 		// TODO receive the on-line user list from the server
-//		ObservableList<String> items = FXCollections.observableArrayList("Single", "Double", "Suite", "Family App");
+		// ObservableList<String> items =
+		// FXCollections.observableArrayList("Single", "Double", "Suite",
+		// "Family App");
 		list.setItems(items);
-		
+
 		list.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		list.setPrefSize(140, 170);
 		paneShareCard.setLeft(list);
@@ -93,21 +103,24 @@ public class ShareCardBox {
 		btnShare.setOnAction(event -> {
 			usersShared = list.getSelectionModel().getSelectedItems();
 			try {
-				ShareWordCard shareWordCard = new ShareWordCard(usersShared, username);
+				Vector<String> usernames= new Vector();
+				for(String i: usersShared){
+					usernames.add(i);
+				}
+				ShareWordCard shareWordCard = new ShareWordCard(usernames, username);
 				shareWordCard.alphaWords2Image(word, translations[0], translations[1]);
 				// TODO send message to the server
 				// if succeed
-				DicTest.getEs().execute(new ClientSocketSend<ShareWordCard>(shareWordCard,server));
-				while(ClientSocketReceive.getMessage() != ""){
-					if(ClientSocketReceive.getMessage() == "WordCardShared"){
+				DicTest.getEs().execute(new ClientSocketSend<ShareWordCard>(shareWordCard, server));
+				while (!ClientSocketReceive.getMessage().equals("")) {
+					if (ClientSocketReceive.getMessage().equals("WordCardShared")) {
 						ClientSocketReceive.setMessage("");
-						DicTest.getEs().execute(new ClientSocketSend<String>("ACK",server));
-						new DialogueBox().displayAlertBox("Your friends have received the Word Card!");		
+						DicTest.getEs().execute(new ClientSocketSend<String>("ACK", server));
+						new DialogueBox().displayAlertBox("Your friends have received the Word Card!");
 						stgShareCard.close();
-					}
-					else{
+					} else {
 						ClientSocketReceive.setMessage("");
-						DicTest.getEs().execute(new ClientSocketSend<String>("ACK",server));
+						DicTest.getEs().execute(new ClientSocketSend<String>("ACK", server));
 						new DialogueBox().displayAlertBox("Error!");
 						stgShareCard.close();
 					}
@@ -115,7 +128,7 @@ public class ShareCardBox {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
+
 		});
 
 		/** Set parent window unanswered */

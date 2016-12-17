@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javafx.scene.image.*;
@@ -22,9 +23,9 @@ public class ShareWordCard implements Serializable {
 	private static final long serialVersionUID = 6175592068468326297L;
 	String userFrom;
 	BufferedImage image;
-	ObservableList<String> usersShared;
+	Vector<String> usersShared;
 
-	public ShareWordCard(ObservableList<String> usersShared, String userFrom) {
+	public ShareWordCard(Vector<String> usersShared, String userFrom) {
 		this.userFrom = userFrom;
 		this.usersShared = usersShared;
 	}

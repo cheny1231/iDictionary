@@ -25,7 +25,7 @@ public class DicTest {
 		/**
 		 * 1、创建size为3的线程池
 		 */
-		es = Executors.newFixedThreadPool(5);
+		es = Executors.newFixedThreadPool(6);
 
 		/**
 		 * 2、通过工厂方法，获取词典翻译的对象

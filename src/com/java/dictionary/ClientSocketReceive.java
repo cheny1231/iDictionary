@@ -2,6 +2,7 @@ package com.java.dictionary;
 
 import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.util.Vector;
 
 import javafx.collections.ObservableList;
 
@@ -12,6 +13,7 @@ public class ClientSocketReceive implements Runnable {
 
 	public ClientSocketReceive(Socket server) {
 		this.server = server;
+		message = "";
 	}
 
 	public void run() {
@@ -19,38 +21,39 @@ public class ClientSocketReceive implements Runnable {
 			ObjectInputStream is = null;
 			is = new ObjectInputStream(server.getInputStream());
 			while (true) {
-				object = is.readObject();
-				if (object instanceof User) {
-//					User.getInstance().setUsername(((User) object).getUsername());
-//					User.getInstance().setPassword(((User) object).getPassword());
-					User.getInstance().setFavors(((User) object).getFavors());
-					setMessage("User");
-					System.out.println(message);
-					object = null;
+				if (message.equals("")) {
+					object = is.readObject();
+					if (object instanceof User) {
+						User.getInstance().setUsername(((User) object).getUsername());
+						User.getInstance().setPassword(((User) object).getPassword());
+						User.getInstance().setFavors(((User) object).getFavors());
+						setMessage("User");
+						System.out.println(message);
+//						object = null;
+					}
+
+					if (object instanceof ShareWordCard) {
+						setMessage("WordCard");
+						((ShareWordCard) object).write2File();
+						((ShareWordCard) object).showImageCard();
+						setMessage("");
+//						setObject(null);
+						DicTest.getEs().execute(new ClientSocketSend<String>("ACK", server));
+						System.out.println(message);
+					}
+
+					if (object instanceof Vector<?>) {
+						setMessage("online user");
+						System.out.println(message);
+					}
+
+					if (object instanceof String) {
+						setMessage((String) object);
+//						object = null;
+						System.out.println(message);
+					}
 				}
 
-				if (object instanceof ShareWordCard) {
-					setMessage("WordCard");
-					((ShareWordCard) object).write2File();
-					((ShareWordCard) object).showImageCard();
-					setMessage("");
-					setObject(null);
-					DicTest.getEs().execute(new ClientSocketSend<String>("ACK",server));
-					System.out.println(message);
-				}
-				
-				if (object instanceof ObservableList<?>) {
-					setMessage("online user");
-					System.out.println(message);
-				}				
-
-				if (object instanceof String) {
-					setMessage((String)object);
-					object = null;
-					System.out.println(message);
-				}
-				
-				
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -65,7 +68,7 @@ public class ClientSocketReceive implements Runnable {
 	public static void setMessage(String message) {
 		ClientSocketReceive.message = message;
 	}
-	
+
 	public static Object getObject() {
 		return object;
 	}
