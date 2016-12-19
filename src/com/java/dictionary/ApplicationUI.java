@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ public class ApplicationUI extends Application {
 	static DicTest dicTest;
 	static NetStatus netStatus;
 	static Socket server;
+//	static ObjectOutputStream os;
 	Vector<TextArea> text;
 	TextArea text1;
 	TextArea text2;
@@ -108,9 +110,11 @@ public class ApplicationUI extends Application {
 						}
 					}
 				}
-				user.setType("Update");
-				System.out.println(user.getFavors().get("YD"));
-				DicTest.getEs().execute(new ClientSocketSend<User>(user,server));
+				if(user.getUsername()!=null){
+					user.setType("Update");
+					System.out.println(user.getYD());
+					DicTest.getEs().execute(new ClientSocketSend<User>(user,server));
+				}
 				if (checkBD.isSelected())
 					dicTest.transBD();
 				else
@@ -159,14 +163,17 @@ public class ApplicationUI extends Application {
 		btnLogout.setOnAction(event -> {
 			// TODO send the user to server
 			try {
-				user.setType("Logout");
-				DicTest.getEs().execute(new ClientSocketSend<User>(user, server));
-//				server.close();
+//				user.setType("Logout");
+//				DicTest.getEs().execute(new ClientSocketSend<User>(user, server));
+				ClientSocketSend.cnt = 0;
+				server.close();
 			} catch (Exception e) {
 //				 TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			user.setFavors(null);
+			user.setBD(0);
+			user.setBY(0);
+			user.setYD(0);
 			user.setPassword(null);
 			user.setUsername(null);
 			btnLogout.setVisible(false);
@@ -179,7 +186,8 @@ public class ApplicationUI extends Application {
 		btnSign.setOnAction(event -> {
 			try {
 				server = new Socket("172.28.173.38", 12345);
-				DicTest.getEs().execute(new ClientSocketReceive(server));
+//				os = new ObjectOutputStream(server.getOutputStream());
+				DicTest.getEs().execute(new ClientSocketReceive(server));			
 				registerBox.display(user, server);
 				if (user.getUsername() != null && user.getPassword() != null) {
 					labelForUser.setText(user.getUsername());

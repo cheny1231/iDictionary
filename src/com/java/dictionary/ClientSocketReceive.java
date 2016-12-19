@@ -1,21 +1,24 @@
 package com.java.dictionary;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.Vector;
-
-import javafx.collections.ObservableList;
+import javafx.application.*;
 
 public class ClientSocketReceive implements Runnable {
 	Socket server;
+//	ObjectOutputStream os;
 	static String message;
 	static Object object;
 
 	public ClientSocketReceive(Socket server) {
 		this.server = server;
+//		this.os = os;
 		message = "";
 	}
 
+	@SuppressWarnings("unchecked")
 	public void run() {
 		try {
 			ObjectInputStream is = null;
@@ -26,26 +29,46 @@ public class ClientSocketReceive implements Runnable {
 					if (object instanceof User) {
 						User.getInstance().setUsername(((User) object).getUsername());
 						User.getInstance().setPassword(((User) object).getPassword());
-						User.getInstance().setFavors(((User) object).getFavors());
+						User.getInstance().setBD(((User) object).getBD());
+						User.getInstance().setBY(((User) object).getBY());
+						User.getInstance().setYD(((User) object).getYD());
 						setMessage("User");
 						System.out.println(message);
 //						object = null;
 					}
 
-					if (object instanceof ShareWordCard) {
-						setMessage("WordCard");
-						((ShareWordCard) object).write2File();
-						((ShareWordCard) object).showImageCard();
-						setMessage("");
-//						setObject(null);
-						DicTest.getEs().execute(new ClientSocketSend<String>("ACK", server));
-						System.out.println(message);
+					if (object instanceof Vector<?>) {
+						if(((Vector<String>)object).get(0).equals("onlineUsers")){
+							setMessage("online user");
+							System.out.println(message);
+						}
+						else{
+							setMessage("WordCard");
+							Platform.runLater(new Runnable() {
+							    @Override
+							    public void run() {
+							    	try {
+										ShareWordCard.alphaWords2Image(((Vector<String>)object).get(2), ((Vector<String>)object).get(3), ((Vector<String>)object).get(4));
+										ShareWordCard.showImageCard(((Vector<String>)object).get(0));
+									} catch (IOException e) {
+										// TODO Auto-generated catch block
+//										e.printStackTrace();
+									}
+									
+							    }
+							});
+							
+							setMessage("");
+//							setObject(null);
+							DicTest.getEs().execute(new ClientSocketSend<String>("ACK", server));
+							System.out.println(message);
+						}
 					}
 
-					if (object instanceof Vector<?>) {
-						setMessage("online user");
-						System.out.println(message);
-					}
+//					if (object instanceof Vector<?>) {
+//						setMessage("online user");
+//						System.out.println(message);
+//					}
 
 					if (object instanceof String) {
 						setMessage((String) object);

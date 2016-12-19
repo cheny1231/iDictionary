@@ -2,7 +2,6 @@ package com.java.dictionary;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Map;
 
 public class User implements Serializable {
 	/**
@@ -15,13 +14,38 @@ public class User implements Serializable {
 	private String username;
 	private String password;
 	private String type;
-	Map<String, Integer> favors;
+	private int BD;
+	private int YD;
+	private int BY;
+
+	public int getBD() {
+		return BD;
+	}
+
+	public void setBD(int bD) {
+		BD = bD;
+	}
+
+	public int getYD() {
+		return YD;
+	}
+
+	public void setYD(int yD) {
+		YD = yD;
+	}
+
+	public int getBY() {
+		return BY;
+	}
+
+	public void setBY(int bY) {
+		BY = bY;
+	}
 
 	private User() {
-		favors = new HashMap<>();
-		favors.put("BD", 0);
-		favors.put("YD", 0);
-		favors.put("BY", 0);
+		BD = 0;
+		YD = 0; 
+		BY = 0;
 	}
 
 	public static User getInstance() {
@@ -29,10 +53,6 @@ public class User implements Serializable {
 			INSTANCE = new User();
 		}
 		return INSTANCE;
-	}
-
-	public Map<String, Integer> getFavors() {
-		return favors;
 	}
 
 	public String getUsername() {
@@ -44,19 +64,25 @@ public class User implements Serializable {
 	}
 
 	public void addFavors(boolean flag, String type) {
-		int temp = Integer.valueOf(String.valueOf(this.favors.get(type)));
-		if (flag)
-			temp++;
-		else {
-			if (temp > 0)
-				temp--;
+//		int temp = Integer.valueOf(String.valueOf(this.favors.get(type)));
+		switch(type){
+		case "BD": if(flag) BD++;
+					else BD--;
+						break;
+		case "YD": if(flag) YD++;
+					else YD--;
+					break;
+		case "BY": if(flag) BY++;
+					else BY--;
+					break;
 		}
-		this.favors.replace(type, temp);
+//		this.favors.replace(type, temp);
+		
 	}
 
-	public void setFavors(Map<String, Integer> favors) {
-		this.favors = favors;
-	}
+//	public void setFavors(HashMap<String, Integer> favors) {
+//		this.favors = favors;
+//	}
 
 	public void setUsername(String username) {
 		this.username = username;
@@ -69,6 +95,10 @@ public class User implements Serializable {
 	public String[] sort() {
 		String[] sortResult = { "BD", "BY", "YD" };
 		String temp;
+		HashMap<String,Integer> favors = new HashMap<String, Integer>();
+		favors.put("BD", BD);
+		favors.put("BY", BY);
+		favors.put("YD", YD);
 		for (int i = 0; i < 2; i++) {
 			for (int j = i + 1; j < 3; j++) {
 				if (favors.get(sortResult[i]) < favors.get(sortResult[j])) {
@@ -83,5 +113,9 @@ public class User implements Serializable {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+	
+	public String getType(){
+		return type;
 	}
 }

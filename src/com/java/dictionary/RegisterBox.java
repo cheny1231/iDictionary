@@ -8,6 +8,7 @@ import javafx.scene.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import javafx.geometry.*;
@@ -31,7 +32,7 @@ public class RegisterBox {
 		Label password = new Label("Password");
 		paneSignup.add(password, 0, 1);
 		Label error = new Label();
-		paneSignup.add(error, 0, 3);
+		paneSignup.add(error, 0, 3, 2, 1);
 		error.setVisible(false);
 
 		/** Set TextFields */
@@ -55,16 +56,19 @@ public class RegisterBox {
 			user.setType("Register");
 			user.setUsername(inputuser.getText());
 			user.setPassword(inputpass.getText());
+			System.out.println(user.getUsername());
 			DicTest.getEs().execute(new ClientSocketSend<User>(user, server));
 			while (true) {
 				if (!ClientSocketReceive.getMessage().equals("")) {
 					if (ClientSocketReceive.getMessage().equals("Success")) {
 						ClientSocketReceive.setMessage("");
+						DicTest.getEs().execute(new ClientSocketSend<String>("ACK", server));
 						stgSignup.close();
 						break;
 					} else {
 						ClientSocketReceive.setMessage("");
 						error.setText("Username existed!");
+						DicTest.getEs().execute(new ClientSocketSend<String>("ACK", server));
 						user.setUsername(null);
 						user.setPassword(null);
 						error.setVisible(true);
@@ -95,14 +99,12 @@ public class RegisterBox {
 				if (!ClientSocketReceive.getMessage().equals("")) {
 					if (ClientSocketReceive.getMessage().equals("User")) {
 						ClientSocketReceive.setMessage("");
-						// DicTest.getEs().execute(new
-						// ClientSocketSend<String>("ACK",server));
+						 DicTest.getEs().execute(new ClientSocketSend<String>("ACK",server));
 						stgSignup.close();
 						break;
 					} else if (ClientSocketReceive.getMessage().equals("Invalid")) {
 						ClientSocketReceive.setMessage("");
-						// DicTest.getEs().execute(new
-						// ClientSocketSend<String>("ACK",server));
+						 DicTest.getEs().execute(new ClientSocketSend<String>("ACK",server));
 						user.setUsername(null);
 						user.setPassword(null);
 						error.setText("You have logged in on another device!");
@@ -110,8 +112,7 @@ public class RegisterBox {
 						break;
 					} else {
 						ClientSocketReceive.setMessage("");
-						// DicTest.getEs().execute(new
-						// ClientSocketSend<String>("ACK",server));
+						 DicTest.getEs().execute(new ClientSocketSend<String>("ACK",server));
 						user.setUsername(null);
 						user.setPassword(null);
 						error.setText("Wrong username or password!");

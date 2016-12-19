@@ -188,8 +188,8 @@ label-view .column-header, .table-view .filler {
 }
 
 .button:pressed, .button:default:hover:pressed {
-  -fx-background-color: black;
-  -fx-text-fill: white;
+  -fx-background-color: gray;
+  -fx-text-fill: black;
 }
 
 .button:focused {

@@ -7,9 +7,9 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 public class ClientSocketSend <T> implements Runnable {
-	Socket server;
 	T t;
-	static int cnt;
+	static int cnt = 0;
+	Socket server;
 	public ClientSocketSend(T t, Socket server) {
 		this.t = t;
 		this.server = server;
@@ -23,9 +23,11 @@ public class ClientSocketSend <T> implements Runnable {
 			}
 			else
 				os = new MyObjectOutputStream(server.getOutputStream());
+//			os = new ObjectOutputStream(server.getOutputStream());
 			os.writeObject(t);
 			os.flush();
 			cnt++;
+//			os.close();
 //			server.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
