@@ -2,25 +2,19 @@ package com.java.dictionary;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-
-import net.sf.json.JSONObject;
 
 /**
- * 翻译抽象类，具体的翻译类都要继承它
+ * The abstract class for translation, which is extended by YDtrans, BDtrans, BYtrans
  * 
- * @author
+ * @author cheny1231
  *
  */
 public abstract class Translate {
 
 	/**
-	 * 词典类型
+	 * Type of dictionary
 	 */
 	public static final int YD = 1;
 	public static final int BD = 2;
@@ -34,11 +28,7 @@ public abstract class Translate {
 	}
 
 	/**
-	 * 设置线程池资源
-	 * 
-	 * @param es
-	 *            线程池资源
-	 * @return
+	 * Set the thread pool
 	 */
 	public Translate setEs(ExecutorService es) {
 		this.es = es;
@@ -46,11 +36,7 @@ public abstract class Translate {
 	}
 
 	/**
-	 * 设置请求参数
-	 * 
-	 * @param param
-	 *            网络请求的参数
-	 * @return
+	 * Set the parameters for requesting
 	 */
 	public Translate setParam(Params param) {
 		this.param = param;
@@ -58,11 +44,7 @@ public abstract class Translate {
 	}
 
 	/**
-	 * 设置回调函数
-	 * 
-	 * @param callBack
-	 *            请求回调函数
-	 * @return
+	 * Set the params for calling back
 	 */
 	public Translate setCallBack(ResultHook callBack) {
 		this.callBack = callBack;
@@ -70,7 +52,7 @@ public abstract class Translate {
 	}
 
 	/**
-	 * 获取网络翻译的入口
+	 * Get the entrance to Internet translation
 	 */
 	public final void getTransResult() {
 		if (es == null)
@@ -82,7 +64,7 @@ public abstract class Translate {
 		es.execute(new Runnable() {
 
 			@Override
-			public void run() {
+			public void run(){
 				String back = NetUtil.getResult(getUrl(param));
 				back = getTrans(back);
 				callBack.result(back);
@@ -90,30 +72,21 @@ public abstract class Translate {
 		});
 	}
 
-	/**
-	 * 获取翻译的抽象方法，具体获取方式由子类实现
-	 * 
-	 * @param result
-	 *            从网络获取的json结果
-	 * @return 从json中获取网络翻译
+	/** 
+	 * Abstract methods to get translation, which is overridden by its children
 	 */
 	protected abstract String getTrans(String result);
 
 	/**
-	 * 获取接口的抽象方法，具体哪个接口由子类返回
+	 * Abstract method to get interfaces, which is determined by its children
 	 * 
-	 * @return 不同翻译方式的接口地址
+	 * @return interface address of different website
 	 */
 	protected abstract String getBaseUrl();
 
 	/**
-	 * 获取请求的URL
+	 * Get Urls of different websites
 	 * 
-	 * @param from
-	 *            需要请求网页的类型
-	 * @param param
-	 *            请求的参数
-	 * @return 返回请求网页类型的URL
 	 */
 	private String getUrl(Params param) {
 		Map<String, String> p = param.getParam();
@@ -133,10 +106,7 @@ public abstract class Translate {
 	}
 
 	/**
-	 * 用于中文的编码
-	 * 
-	 * @param input
-	 * @return
+	 * Encoding for Chinese
 	 */
 	String encode(String input) {
 		if (input == null) {

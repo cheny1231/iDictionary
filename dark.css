@@ -109,6 +109,7 @@ label-view .column-header, .table-view .filler {
     /*scrollbar-arrow-color:yellow;  
     scrollbar-base-color:lightsalmon;  
     overflow: hidden;*/  
+	-fx-font-size: 11pt;
 	-fx-outline:none;
 	-fx-border-width: 2;
 }

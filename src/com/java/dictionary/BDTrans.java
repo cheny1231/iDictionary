@@ -3,9 +3,9 @@ package com.java.dictionary;
 import net.sf.json.JSONObject;
 
 /**
- * 百度翻译类
+ * Translation class for Baidu
  * 
- * @author
+ * @author cheny1231
  *
  */
 public class BDTrans extends Translate {
@@ -15,7 +15,7 @@ public class BDTrans extends Translate {
 	public static final String BDSECURITY = "5uMwjl5FMHh0YrKKd4LH";
 
 	/**
-	 * 单例模式
+	 * Single Instance
 	 */
 	private static BDTrans INSTANCE = null;
 
@@ -32,7 +32,11 @@ public class BDTrans extends Translate {
 
 	@Override
 	protected String getTrans(String result) {
-		return ((JSONObject) new JSONObject(result).getJSONArray("trans_result").get(0)).getString("dst");
+		try{
+		return ((JSONObject) JSONObject.fromString(result).getJSONArray("trans_result").get(0)).getString("dst");
+		}catch(Exception ex){
+			return "未找到该单词";
+		}
 	}
 
 	@Override

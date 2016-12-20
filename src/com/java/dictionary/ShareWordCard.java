@@ -4,8 +4,6 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.Vector;
-
 import javax.imageio.ImageIO;
 import javafx.scene.image.*;
 import javafx.scene.image.Image;
@@ -13,22 +11,15 @@ import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+/**
+ * To generate the Word Card Image
+ * 
+ * @author: cheny1231
+ *
+ */
+public class ShareWordCard {
 
-public class ShareWordCard implements Serializable {
-
-	/**
-	 * 
-	 */
 	static int i = 1;
-//	private static final long serialVersionUID = 6175592068468326297L;
-//	String userFrom = "";
-//	Vector<String> usersShared = new Vector<String>();
-//	File file;
-//	
-//	public ShareWordCard(Vector<String> usersShared, String userFrom) {
-//		this.userFrom = userFrom;
-//		this.usersShared = usersShared;
-//	}
 
 	public static void alphaWords2Image(String word, String translation, String type) throws IOException {
 		 FileOutputStream fos = null;
@@ -73,38 +64,10 @@ public class ShareWordCard implements Serializable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			// if (fos != null) {
-			// fos.close();
-			// }
+
 		}
 	}
 
-//	public void write2File() {
-//		try {
-//			FileOutputStream fosr = null;
-//			byte[] inputByte = null;
-//			int length = 0;
-//			FileInputStream dis = null;
-//	        dis = new FileInputStream(file);
-//			String path = System.getProperty("user.dir").replace("\\", "/");
-//			fosr = new FileOutputStream(new File(path.concat("/images/WordCard1.png")));
-//			inputByte = new byte[1024];
-//			while ((length = dis.read(inputByte, 0, inputByte.length)) > 0) {
-//                System.out.println(length);
-//                fosr.write(inputByte, 0, length);
-//                fosr.flush();
-//            }
-//			if (fosr != null)
-//                fosr.close();
-//            if (dis != null)
-//                dis.close();
-////			ImageIO.write(image, "png", fos);
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//	}
 
 	public static void showImageCard(String userFrom) {
 		try {

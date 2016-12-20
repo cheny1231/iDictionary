@@ -3,9 +3,14 @@ package com.java.dictionary;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.net.Socket;
 
+/**
+ * To Send object to server through socket
+ * 
+ * @author: cheny1231
+ *
+ */
 public class ClientSocketSend <T> implements Runnable {
 	T t;
 	static int cnt = 0;
@@ -23,14 +28,10 @@ public class ClientSocketSend <T> implements Runnable {
 			}
 			else
 				os = new MyObjectOutputStream(server.getOutputStream());
-//			os = new ObjectOutputStream(server.getOutputStream());
 			os.writeObject(t);
 			os.flush();
 			cnt++;
-//			os.close();
-//			server.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

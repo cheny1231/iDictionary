@@ -3,6 +3,13 @@ package com.java.dictionary;
 import java.io.Serializable;
 import java.util.HashMap;
 
+/**
+ * User class to save the information of current user
+ * 
+ * @author: cheny1231
+ *
+ */
+
 public class User implements Serializable {
 	/**
 	 * 

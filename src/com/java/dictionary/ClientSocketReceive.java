@@ -6,15 +6,20 @@ import java.net.Socket;
 import java.util.Vector;
 import javafx.application.*;
 
+/**
+ * To Receive object from server through socket
+ * 
+ * @author: cheny1231
+ *
+ */
+
 public class ClientSocketReceive implements Runnable {
 	Socket server;
-//	ObjectOutputStream os;
 	static String message;
 	static Object object;
 
 	public ClientSocketReceive(Socket server) {
 		this.server = server;
-//		this.os = os;
 		message = "";
 	}
 
@@ -34,52 +39,48 @@ public class ClientSocketReceive implements Runnable {
 						User.getInstance().setYD(((User) object).getYD());
 						setMessage("User");
 						System.out.println(message);
-//						object = null;
 					}
 
 					if (object instanceof Vector<?>) {
-						if(((Vector<String>)object).get(0).equals("onlineUsers")){
+						if (((Vector<String>) object).get(0).equals("onlineUsers")) {
 							setMessage("online user");
 							System.out.println(message);
-						}
-						else{
+						} else {
 							setMessage("WordCard");
+							Vector<String> card = new Vector<String>();
+							for (String i : (Vector<String>) object) {
+								card.add(i);
+							}
 							Platform.runLater(new Runnable() {
-							    @Override
-							    public void run() {
-							    	try {
-										ShareWordCard.alphaWords2Image(((Vector<String>)object).get(2), ((Vector<String>)object).get(3), ((Vector<String>)object).get(4));
-										ShareWordCard.showImageCard(((Vector<String>)object).get(0));
+								@Override
+								public void run() {
+									try {
+										ShareWordCard.alphaWords2Image(card.get(2), card.get(3), card.get(4));
+										ShareWordCard.showImageCard(card.get(0));
 									} catch (IOException e) {
-										// TODO Auto-generated catch block
-//										e.printStackTrace();
+										e.printStackTrace();
 									}
-									
-							    }
+
+								}
 							});
-							
+
 							setMessage("");
-//							setObject(null);
 							DicTest.getEs().execute(new ClientSocketSend<String>("ACK", server));
 							System.out.println(message);
 						}
 					}
 
-//					if (object instanceof Vector<?>) {
-//						setMessage("online user");
-//						System.out.println(message);
-//					}
-
 					if (object instanceof String) {
-						setMessage((String) object);
-//						object = null;
-						System.out.println(message);
+						if (!((String) object).equals("Active")) {
+							setMessage((String) object);
+							System.out.println(message);
+						}
 					}
 				}
-
+				DicTest.getEs().execute(new ClientSocketSend<String>("Active", server));
+				System.out.println("Active");
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

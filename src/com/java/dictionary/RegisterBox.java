@@ -4,14 +4,21 @@ import javafx.stage.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.*;
+import javafx.scene.paint.Color;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import javafx.geometry.*;
+
+/**
+ * To generate the Window for Register/Log in
+ * 
+ * @author: cheny1231
+ *
+ */
 
 public class RegisterBox {
 
@@ -34,6 +41,8 @@ public class RegisterBox {
 		Label error = new Label();
 		paneSignup.add(error, 0, 3, 2, 1);
 		error.setVisible(false);
+		error.setStyle("-fx-text-fill:red");
+		error.setTextFill(Color.RED);
 
 		/** Set TextFields */
 		TextField inputuser = new TextField();
@@ -46,13 +55,6 @@ public class RegisterBox {
 		/** Set Button for Register */
 		Button btnRegister = new Button("Register Now!");
 		btnRegister.setOnAction(event -> {
-			// TODO send message to the server
-			// try {
-			// ApplicationUI.setServer(new Socket("172.28.173.38", 12345));
-			// } catch (Exception e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// }
 			user.setType("Register");
 			user.setUsername(inputuser.getText());
 			user.setPassword(inputpass.getText());
@@ -83,18 +85,10 @@ public class RegisterBox {
 		/** Set Button for Log in */
 		Button btnLogin = new Button("Log in");
 		btnLogin.setOnAction(event -> {
-			// try {
-			// ApplicationUI.setServer(new Socket("172.28.173.38", 12345));
-			// } catch (Exception e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// }
 			user.setType("Login");
 			user.setUsername(inputuser.getText());
 			user.setPassword(inputpass.getText());
 			DicTest.getEs().execute(new ClientSocketSend<User>(user, server));
-			// user.setUsername(null);
-			// user.setPassword(null);
 			while (true) {
 				if (!ClientSocketReceive.getMessage().equals("")) {
 					if (ClientSocketReceive.getMessage().equals("User")) {
@@ -136,11 +130,9 @@ public class RegisterBox {
 			sceneSignup.getStylesheets().add(fileCss.toURL().toExternalForm());
 			is.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		stgSignup.setScene(sceneSignup);
-		// stgSignup.show();
 		stgSignup.showAndWait();
 	}
 }

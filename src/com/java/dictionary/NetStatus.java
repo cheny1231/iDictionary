@@ -31,7 +31,6 @@ public class NetStatus {
             br.close();   
   
             if (null != sb && !sb.toString().equals("")) {   
-                String logString = "";   
                 if (sb.toString().indexOf("TTL") > 0) {   
                     // ÍøÂç³©Í¨    
                     connect = true;  

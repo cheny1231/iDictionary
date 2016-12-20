@@ -11,12 +11,18 @@ import javafx.geometry.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Vector;
 
 import javafx.beans.value.*;
 import javafx.collections.*;
+
+/**
+ * To generate the window for sharing cards
+ * 
+ * @author: cheny1231
+ *
+ */
 
 public class ShareCardBox {
 
@@ -29,10 +35,7 @@ public class ShareCardBox {
 		BorderPane paneShareCard = new BorderPane();
 		Stage stgShareCard = new Stage();
 		stgShareCard.initModality(Modality.APPLICATION_MODAL);
-		// paneShareCard.setPadding(new Insets(5, 5, 5, 5));
-		// paneShareCard.setVgap(5);
-		// paneShareCard.setHgap(5);
-
+	
 		/** Set the Labels */
 		Label tips = new Label("Choose the user(s) to share the word card");
 		paneShareCard.setTop(tips);
@@ -44,9 +47,6 @@ public class ShareCardBox {
 		BorderPane.setAlignment(userList, Pos.TOP_CENTER);
 
 		/** Set the List */
-		
-//		ListView<String> list = new ListView<>();
-//		ObservableList<String> items = FXCollections.observableArrayList();
 		ListView<Item> list = new ListView<Item>();
 		DicTest.getEs().execute(new ClientSocketSend<String>("ListOfOnlineUser", server));
 		while (true) {
@@ -82,7 +82,6 @@ public class ShareCardBox {
 				System.out.println("ListNothing");
 		}
 		
-//		list.setItems(items);
 		list.setCellFactory(CheckBoxListCell.forListView(new Callback<Item, ObservableValue<Boolean>>(){
 			public ObservableValue<Boolean> call(Item item){
 				return item.onProperty();
@@ -93,20 +92,6 @@ public class ShareCardBox {
 		list.setPrefSize(140, 170);
 		paneShareCard.setLeft(list);
 		BorderPane.setAlignment(list, Pos.TOP_CENTER);
-//		list.setOnMouseClicked(event -> {
-//			ObservableList<Item> selectedItems = list.getSelectionModel().getSelectedItems();
-//			userList.setText("");
-//			for (Item s : selectedItems) {
-//				userList.appendText(s.getName());
-//			}
-//		});
-
-		// userList.textProperty().bind(list.getSelectionModel().selectedItemProperty());
-		// list.getSelectionModel().selectedItemProperty().addListener(
-		// (ObservableValue<? extends String> observable, String oldValue,
-		// String newValue) ->{
-		// userList.setText(newValue);
-		// });
 
 		/** Set the Button */
 		Button btnShare = new Button("Share!");
@@ -119,7 +104,6 @@ public class ShareCardBox {
 			Vector<String> shareWordCard = new Vector<String>();
 			usersShared = list.getItems();
 			try {
-//				Vector<String> usernames = new Vector<String>();
 				shareWordCard.add(username);
 				for (Item i : usersShared) {
 					if(i.isOn()){
@@ -129,15 +113,10 @@ public class ShareCardBox {
 							shareWordCard.add(i.getName());
 					}
 				}
-//				ShareWordCard shareWordCard = new ShareWordCard(usernames, username);
 				shareWordCard.add(word);
 				shareWordCard.add(translations[0]);
 				shareWordCard.add(translations[1]);
-//				shareWordCard.alphaWords2Image(word, translations[0], translations[1]);
-				// TODO send message to the server
-				// if succeed
-//				ClientSocketSend.cnt = 0;
-				DicTest.getEs().execute(new ClientSocketSend<Vector>(shareWordCard, server));
+				DicTest.getEs().execute(new ClientSocketSend<Vector<String>>(shareWordCard, server));
 				while (true) {
 					if (!ClientSocketReceive.getMessage().equals("")) {
 						if (ClientSocketReceive.getMessage().equals("WordCardShared")) {

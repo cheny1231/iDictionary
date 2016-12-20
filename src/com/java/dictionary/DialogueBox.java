@@ -3,15 +3,19 @@ package com.java.dictionary;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.*;
 import javafx.scene.control.*;
+
+/**
+ * To generate the dialogue box with certain alert words
+ * 
+ * @author: cheny1231
+ *
+ */
 
 public class DialogueBox {
 	
@@ -21,7 +25,6 @@ public class DialogueBox {
 		VBox paneAlertBox = new VBox(10); 		
 		Stage stgAlertBox=new Stage();  
 		stgAlertBox.initModality(Modality.APPLICATION_MODAL);
-//		paneShareSuccess.setPadding(new Insets(5, 5, 5, 5));  
 		paneAlertBox.setPrefSize(300, 80);
 		
 		
@@ -46,7 +49,6 @@ public class DialogueBox {
 			sceneAlertBox.getStylesheets().add(fileCss.toURL().toExternalForm());
 			is.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		stgAlertBox.setScene(sceneAlertBox); 
@@ -60,7 +62,6 @@ public class DialogueBox {
 		stgNetUnconnected.setTitle("Internet Unavailable");
 		stgNetUnconnected.initModality(Modality.APPLICATION_MODAL); 
 		paneNetUnconnected.setPrefSize(350, 80);
-		
 		
 		/**Set the Labels*/
 		Label NetUnconnected = new Label("I've tried really hard to connect the Internet T^T");
@@ -85,7 +86,6 @@ public class DialogueBox {
 			sceneNetUnconnected.getStylesheets().add(fileCss.toURL().toExternalForm());
 			is.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

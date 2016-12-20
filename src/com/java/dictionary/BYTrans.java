@@ -4,9 +4,9 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
- * 必应翻译类
+ * Translation class for Bing
  * 
- * @author rhg
+ * @author cheny1231
  *
  */
 public class BYTrans extends Translate {
@@ -14,7 +14,7 @@ public class BYTrans extends Translate {
 	public static final String BASEBY = "http://xtk.azurewebsites.net/BingDictService.aspx";
 
 	/**
-	 * 单例模式
+	 * Single Instance
 	 */
 	private static BYTrans INSTANCE = null;
 
@@ -37,17 +37,24 @@ public class BYTrans extends Translate {
 	 */
 	@Override
 	protected String getTrans(String result) {
+		try{
 		StringBuilder sb = new StringBuilder();
-		JSONArray ja = new JSONObject(result).getJSONArray("defs");
-		for (int i = 0; i < ja.length(); i++) {
-			JSONObject jo = ja.getJSONObject(i);
-			sb.append(jo.get("pos"));
-			sb.append(":");
-			sb.append(jo.get("def"));
-			sb.append("     ");
+		JSONObject temp = JSONObject.fromString(result);
+		System.out.println(temp);
+			JSONArray ja = temp.getJSONArray("defs");
+			for (int i = 0; i < ja.length(); i++) {
+				JSONObject jo = ja.getJSONObject(i);
+				sb.append(jo.get("pos"));
+				sb.append(":");
+				sb.append(jo.get("def"));
+				sb.append("     ");
+			}
+			return sb.toString();
 
 		}
-		return sb.toString();
+		catch(Exception ex){
+			return "未找到该单词";
+		}
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package com.java.dictionary;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javafx.scene.control.TextArea;
@@ -17,25 +16,25 @@ public class DicTest {
 	static ExecutorService es;
 	static String qName;
 	/**
-	 * 多个词典查询的时候使用多线程，StringBuffer较StringBuilder多线程安全，使用StringBuffer
+	 * Use multiple threads for different dictionary, StringBuffer is more safe than StringBuilder
 	 */
 	static StringBuffer text = new StringBuffer();
 
 	public DicTest() {
 		/**
-		 * 1、创建size为3的线程池
+		 * Thread pool of 6
 		 */
 		es = Executors.newFixedThreadPool(6);
 
 		/**
-		 * 2、通过工厂方法，获取词典翻译的对象
+		 * Get the result through factory method
 		 */
 		tlBY = TransFactory.getTranslate(Translate.BY);
 		tlYD = TransFactory.getTranslate(Translate.YD);
 		tlBD = TransFactory.getTranslate(Translate.BD);
 
 		/**
-		 * 3、每类词典设置参数，初始化的时候设置即可
+		 * Set params for different dictionary
 		 */
 		tlBY.setEs(es).setParam(() -> {
 			Map<String, String> param = new HashMap<>();
@@ -91,7 +90,7 @@ public class DicTest {
 	}
 
 	/**
-	 * 4、运行翻译
+	 * Translation
 	 */
 	public void transBD() {
 		Translate tlBD = TransFactory.getTranslate(Translate.BD);
@@ -109,14 +108,12 @@ public class DicTest {
 	}
 
 	private void setDataBD(String str) {
-		// text.append(str).append("\n");
 		BDtext.setText(str);
 		BDtext.appendText("\n\n————百度翻译");
 
 	}
 
 	private void setDataBY(String str) {
-		// text.append(str).append("\n");
 		String[] strs = str.split("     ");
 		BYtext.setText(strs[0] + "\n");
 		for (int i = 1; i < strs.length; i++)
@@ -125,7 +122,6 @@ public class DicTest {
 	}
 
 	private void setDataYD(String str) {
-		// text.append(str).append("\n");
 		YDtext.setText(str);
 		YDtext.appendText("\n\n————有道翻译");
 	}

@@ -4,14 +4,14 @@ package com.java.dictionary;
 import net.sf.json.JSONObject;
 
 /**
- * 有道翻译类
- * @author 
+ * Translation class for Youdao
+ * @author cheny1231
  *
  */
 public class YDTrans extends Translate {
 	
 	/**
-	 * 单例模式
+	 * Single-Instance 
 	 */
 	private static YDTrans INSTANCE = null;
 	
@@ -32,8 +32,15 @@ public class YDTrans extends Translate {
 	public static final String BASEYD = "http://fanyi.youdao.com/openapi.do";
 	@Override
 	protected String getTrans(String result) {
-		// TODO Auto-generated method stub
-		return (String) new JSONObject(result).getJSONObject("basic").getJSONArray("explains").get(0);
+		try{
+		if(JSONObject.fromString(result).has("basic")){
+			return (String) JSONObject.fromString(result).getJSONObject("basic").getJSONArray("explains").get(0);
+		}
+		else
+			return "未找到该单词";
+		}catch(Exception ex){
+			return "未找到该单词";
+		}
 	}
 
 	@Override

@@ -2,13 +2,8 @@ package com.java.dictionary;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
 
 import javafx.application.Application;
@@ -21,12 +16,18 @@ import javafx.scene.*;
 import javafx.geometry.*;
 import javafx.beans.binding.Bindings;
 
+/**
+ * The applicationUI class is the entrance of the program and the main UI design
+ * 
+ * @author: cheny1231
+ *
+ */
+
 public class ApplicationUI extends Application {
 	static User user;
 	static DicTest dicTest;
 	static NetStatus netStatus;
 	static Socket server;
-//	static ObjectOutputStream os;
 	Vector<TextArea> text;
 	TextArea text1;
 	TextArea text2;
@@ -161,15 +162,13 @@ public class ApplicationUI extends Application {
 		pane.add(btnLogout, 4, 1, 1, 1);
 		btnLogout.setVisible(false);
 		btnLogout.setOnAction(event -> {
-			// TODO send the user to server
 			try {
 //				user.setType("Logout");
 //				DicTest.getEs().execute(new ClientSocketSend<User>(user, server));
 				ClientSocketSend.cnt = 0;
 				server.close();
 			} catch (Exception e) {
-//				 TODO Auto-generated catch block
-				e.printStackTrace();
+//				e.printStackTrace();
 			}
 			user.setBD(0);
 			user.setBY(0);
@@ -185,8 +184,8 @@ public class ApplicationUI extends Application {
 		RegisterBox registerBox = new RegisterBox();
 		btnSign.setOnAction(event -> {
 			try {
+				//Open Socket
 				server = new Socket("172.28.173.38", 12345);
-//				os = new ObjectOutputStream(server.getOutputStream());
 				DicTest.getEs().execute(new ClientSocketReceive(server));			
 				registerBox.display(user, server);
 				if (user.getUsername() != null && user.getPassword() != null) {
@@ -199,7 +198,7 @@ public class ApplicationUI extends Application {
 					server.close();
 			} catch (Exception e) {
 				new DialogueBox().displayNetUnconnected();
-				e.printStackTrace();
+//				e.printStackTrace();
 				}
 		});
 
@@ -287,8 +286,6 @@ public class ApplicationUI extends Application {
 		primaryStage.setTitle("iDictionary");
 		primaryStage.show();
 		
-		/*Open socket*/
-
 
 	}
 

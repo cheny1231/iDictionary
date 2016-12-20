@@ -5,6 +5,13 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+/**
+ * The Item class is the element in the listView of online users
+ * 
+ * @author: cheny1231
+ *
+ */
+
 public class Item{
 	private final StringProperty name = new SimpleStringProperty();
 	private final BooleanProperty on = new SimpleBooleanProperty();
