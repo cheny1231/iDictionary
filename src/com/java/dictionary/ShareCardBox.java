@@ -13,6 +13,11 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.Socket;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+
+import com.java.dictionary.dic.DicHelper;
+import com.java.dictionary.net.ClientSocketReceive;
+import com.java.dictionary.net.ClientSocketSend;
 
 import javafx.beans.value.*;
 import javafx.collections.*;
@@ -25,6 +30,8 @@ import javafx.collections.*;
  */
 
 public class ShareCardBox {
+	
+	ExecutorService es ;
 
 	// static DialogueBox dialogueBox;
 	ObservableList<Item> usersShared;
@@ -48,7 +55,7 @@ public class ShareCardBox {
 
 		/** Set the List */
 		ListView<Item> list = new ListView<Item>();
-		DicTest.getEs().execute(new ClientSocketSend<String>("ListOfOnlineUser", server));
+		es.execute(new ClientSocketSend<String>("ListOfOnlineUser", server));
 		while (true) {
 			if (!ClientSocketReceive.getMessage().equals("")) {
 				if (ClientSocketReceive.getMessage().equals("online user")) {
@@ -68,12 +75,12 @@ public class ShareCardBox {
 					}
 					ClientSocketReceive.setMessage("");
 					ClientSocketReceive.setObject(null);
-					DicTest.getEs().execute(new ClientSocketSend<String>("ACK", server));
+					es.execute(new ClientSocketSend<String>("ACK", server));
 					break;
 				} else {
 					ClientSocketReceive.setMessage("");
 					ClientSocketReceive.setObject(null);
-					DicTest.getEs().execute(new ClientSocketSend<String>("ACK", server));
+					es.execute(new ClientSocketSend<String>("ACK", server));
 					new DialogueBox().displayAlertBox("Unaccessible to user list!");
 					stgShareCard.close();
 					break;
@@ -116,18 +123,18 @@ public class ShareCardBox {
 				shareWordCard.add(word);
 				shareWordCard.add(translations[0]);
 				shareWordCard.add(translations[1]);
-				DicTest.getEs().execute(new ClientSocketSend<Vector<String>>(shareWordCard, server));
+				es.execute(new ClientSocketSend<Vector<String>>(shareWordCard, server));
 				while (true) {
 					if (!ClientSocketReceive.getMessage().equals("")) {
 						if (ClientSocketReceive.getMessage().equals("WordCardShared")) {
 							ClientSocketReceive.setMessage("");
-							DicTest.getEs().execute(new ClientSocketSend<String>("ACK", server));
+							es.execute(new ClientSocketSend<String>("ACK", server));
 							new DialogueBox().displayAlertBox("Your friends have received the Word Card!");
 							stgShareCard.close();
 							break;
 						} else {
 							ClientSocketReceive.setMessage("");
-							DicTest.getEs().execute(new ClientSocketSend<String>("ACK", server));
+							es.execute(new ClientSocketSend<String>("ACK", server));
 							new DialogueBox().displayAlertBox("Error!");
 							stgShareCard.close();
 							break;

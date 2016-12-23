@@ -4,17 +4,40 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import com.java.dictionary.bean.GroupBean;
+import com.java.dictionary.bean.FavorBean;
+import com.java.dictionary.common.IMessage;
+import com.java.dictionary.common.ResultHook;
+import com.java.dictionary.common.UserHelper;
+import com.java.dictionary.dic.DicHelper;
+import com.java.dictionary.net.ClientSocketReceive;
+import com.java.dictionary.net.ClientSocketSend;
+import com.java.dictionary.net.NetStatus;
 
 import javafx.application.Application;
-import javafx.stage.*;
-import javafx.scene.control.*;
-import javafx.scene.image.*;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
-import javafx.scene.*;
-import javafx.geometry.*;
 import javafx.beans.binding.Bindings;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 /**
  * The applicationUI class is the entrance of the program and the main UI design
@@ -23,41 +46,70 @@ import javafx.beans.binding.Bindings;
  *
  */
 
-public class ApplicationUI extends Application {
-	static User user;
-	static DicTest dicTest;
+public class ApplicationUI extends Application implements EventHandler<ActionEvent> {
+
+	private static final String ID_BUTTON_SIGN = "sign";
+	private static final String ID_BUTTON_SEARCH = "search";
+	private static final String ID_BUTTON_EXIT = "logout";
+	public static final String ID_BD = "BD";
+	public static final String ID_BY = "BY";
+	public static final String ID_YD = "YD";
+	public static final String ID_BUTTON_LIKE_BD = "LIKE_BD";
+	public static final String ID_BUTTON_LIKE_BY = "LIKE_BY";
+	public static final String ID_BUTTON_LIKE_YD = "LIKE_YD";
+	public static final String ID_BUTTON_SHARE_BD = "SHARE_BD";
+	public static final String ID_BUTTON_SHARE_BY = "SHARE_BY";
+	public static final String ID_BUTTON_SHARE_YD = "SHARE_YD";
+
+	static ExecutorService es;
+
+	// static User user;
+	static UserHelper userHelper;
+	static DicHelper dicHelper;
 	static NetStatus netStatus;
 	static Socket server;
+
+	DialogueBox dialogueBox;
+	ShareCardBox shareCardBox;
 	Vector<TextArea> text;
-	TextArea text1;
-	TextArea text2;
-	TextArea text3;
-	String[] sortResult;
+	RegisterBox registerBox;
+	TextField inputWord;
+	CheckBox checkBD;
+	CheckBox checkBY;
+	CheckBox checkYD;
+	Label labelForUser;
+	Button btnSign;
+	Button btnLogout;
+	Button btnSearch;
+
+	// String[] sortResult;
 	Vector<ToggleButton> btnFavor = new Vector<ToggleButton>();
+
+	static List<GroupBean> group = new LinkedList<>();
+	GroupBean group1 = new GroupBean();
+	GroupBean group2 = new GroupBean();
+	GroupBean group3 = new GroupBean();
+
 	Object object;
-//	long start = 0;
+	// long start = 0;
+
+	public static void main(String[] args) {
+		/**
+		 * Thread pool of 6
+		 */
+		es = Executors.newFixedThreadPool(6);
+		// user = ;
+		userHelper = new UserHelper(UserDB.getInstance());
+		dicHelper = new DicHelper();
+		dicHelper.setBDCallback(BDCallback);
+		dicHelper.setBYCallback(BYCallback);
+		dicHelper.setYDCallback(YDCallback);
+
+		netStatus = new NetStatus();
+		launch(args);
+	}
 
 	public void start(Stage primaryStage) throws Exception {
-		
-		/* Initialize variables */
-		DialogueBox dialogueBox = new DialogueBox();
-		ToggleButton btnFavorBD = new ToggleButton();
-		ToggleButton btnFavorBY = new ToggleButton();
-		ToggleButton btnFavorYD = new ToggleButton();
-		btnFavor.add(btnFavorBD);
-		btnFavor.add(btnFavorBY);
-		btnFavor.add(btnFavorYD);
-		text = new Vector<TextArea>();
-		text1 = new TextArea();
-		text2 = new TextArea();
-		text3 = new TextArea();
-		text.add(text1);
-		text.add(text2);
-		text.add(text3);
-
-		/* Set the Stream */
-		InputStream is = null;
-		String path = System.getProperty("user.dir").replace("\\", "/");
 
 		/* Set Grid Pane */
 		GridPane pane = new GridPane();
@@ -65,174 +117,103 @@ public class ApplicationUI extends Application {
 		pane.setVgap(5);
 		pane.setHgap(5);
 
+		/* Initialize variables */
+		dialogueBox = new DialogueBox();
+		ToggleButton btnFavor1 = new ToggleButton();
+		ToggleButton btnFavor2 = new ToggleButton();
+		ToggleButton btnFavor3 = new ToggleButton();
+		btnFavor.add(btnFavor1);
+		btnFavor.add(btnFavor2);
+		btnFavor.add(btnFavor3);
+		TextArea textArea1 = new TextArea();
+		TextArea textArea2 = new TextArea();
+		TextArea textArea3 = new TextArea();
+
 		/* Set Input Box */
-		TextField inputWord = new TextField();
+		inputWord = new TextField();
 		inputWord.setPromptText("Enter the word");
 		GridPane.setConstraints(inputWord, 0, 0, 3, 1);
 		pane.getChildren().add(inputWord);
 
 		/* Set Check Field */
-		CheckBox checkBD = new CheckBox("BaiDu");
-		CheckBox checkBY = new CheckBox("Bing");
-		CheckBox checkYD = new CheckBox("YouDao");
-		checkBD.setSelected(true);
-		checkBY.setSelected(true);
-		checkYD.setSelected(true);
+		initCheckBox();
 		pane.add(checkBD, 0, 1, 1, 1);
 		pane.add(checkBY, 1, 1, 1, 1);
 		pane.add(checkYD, 2, 1, 1, 1);
 
 		/* Set Search Button */
-		Button btnSearch = new Button("Search");
-		btnSearch.setOnAction(event -> {
-			// start = System.currentTimeMillis();
-			if ((inputWord.getText() != null && !inputWord.getText().isEmpty())) {
-				DicTest.setqName(inputWord.getText());
-				btnFavorBD.setSelected(false);
-				btnFavorBY.setSelected(false);
-				btnFavorYD.setSelected(false);
-				// if (!netStatus.isConnect()) {
-				// new DialogueBox().displayNetUnconnected();
-				// } else {
-				// System.out.println(System.currentTimeMillis() - start);
-				if (user.getUsername() != null) {
-					sortResult = user.sort();
-					for (int i = 0; i < 3; i++) {
-						switch (sortResult[i]) {
-						case "BD":
-							dicTest.setBDtext(text.get(i));
-							break;
-						case "BY":
-							dicTest.setBYtext(text.get(i));
-							break;
-						case "YD":
-							dicTest.setYDtext(text.get(i));
-							break;
-						}
-					}
-				}
-				if(user.getUsername()!=null){
-					user.setType("Update");
-					System.out.println(user.getYD());
-					DicTest.getEs().execute(new ClientSocketSend<User>(user,server));
-				}
-				if (checkBD.isSelected())
-					dicTest.transBD();
-				else
-					dicTest.getBDtext().clear();
-
-				if (checkBY.isSelected())
-					dicTest.transBY();
-				else
-					dicTest.getBYtext().clear();
-
-				if (checkYD.isSelected())
-					dicTest.transYD();
-				else
-					dicTest.getYDtext().clear();
-				// }
-			}
-		});
+		btnSearch = new Button("Search");
+		btnSearch.setId(ID_BUTTON_SEARCH);
+		btnSearch.setOnAction(this);
 		GridPane.setConstraints(btnSearch, 3, 0, 1, 1);
 		pane.getChildren().add(btnSearch);
 
 		/* Set TextAreas */
-		text.get(1).setWrapText(true);
-		text.get(0).setWrapText(true);
-		text.get(2).setWrapText(true);
-		pane.add(text.get(0), 0, 2, 4, 3);
-		pane.add(text.get(1), 0, 5, 4, 3);
-		pane.add(text.get(2), 0, 8, 4, 3);
-		dicTest.setBDtext(text.get(0));
-		dicTest.setBYtext(text.get(1));
-		dicTest.setYDtext(text.get(2));
+		textArea1.setWrapText(true);
+		textArea2.setWrapText(true);
+		textArea3.setWrapText(true);
+		pane.add(textArea1, 0, 2, 4, 3);
+		pane.add(textArea2, 0, 5, 4, 3);
+		pane.add(textArea3, 0, 8, 4, 3);
+		/*
+		 * dicHelper.setBDtext(text.get(0)); dicHelper.setBYtext(text.get(1));
+		 * dicHelper.setYDtext(text.get(2));
+		 */
 
 		/* Set Login Label */
-		Label labelForUser = new Label();
+		labelForUser = new Label();
 		pane.add(labelForUser, 4, 0, 1, 1);
 		labelForUser.setAlignment(Pos.CENTER);
 		labelForUser.setVisible(false);
 
 		/* Set Logout & Login Button */
-		Button btnSign = new Button("Register/Login");
-		Button btnLogout = new Button("Log out");
+		btnSign = new Button("Register/Login");
+		btnSign.setId(ID_BUTTON_SIGN);
+
+		btnLogout = new Button("Log out");
+		btnLogout.setId(ID_BUTTON_EXIT);
 		btnLogout.setStyle("-fx-font-size:8pt");
 
 		// Logout
 		pane.add(btnLogout, 4, 1, 1, 1);
 		btnLogout.setVisible(false);
-		btnLogout.setOnAction(event -> {
-			try {
-//				user.setType("Logout");
-//				DicTest.getEs().execute(new ClientSocketSend<User>(user, server));
-				ClientSocketSend.cnt = 0;
-				server.close();
-			} catch (Exception e) {
-//				e.printStackTrace();
-			}
-			user.setBD(0);
-			user.setBY(0);
-			user.setYD(0);
-			user.setPassword(null);
-			user.setUsername(null);
-			btnLogout.setVisible(false);
-			labelForUser.setVisible(false);
-			btnSign.setVisible(true);
-		});
+		btnLogout.setOnAction(this);
 		// Login
 		pane.add(btnSign, 4, 0, 1, 1);
-		RegisterBox registerBox = new RegisterBox();
-		btnSign.setOnAction(event -> {
-			try {
-				//Open Socket
-				server = new Socket("172.28.173.38", 12345);
-				DicTest.getEs().execute(new ClientSocketReceive(server));			
-				registerBox.display(user, server);
-				if (user.getUsername() != null && user.getPassword() != null) {
-					labelForUser.setText(user.getUsername());
-					btnSign.setVisible(false);
-					labelForUser.setVisible(true);
-					btnLogout.setVisible(true);
-				}
-				else
-					server.close();
-			} catch (Exception e) {
-				new DialogueBox().displayNetUnconnected();
-//				e.printStackTrace();
-				}
-		});
+		registerBox = new RegisterBox();
+		btnSign.setOnAction(this);
 
 		/* Set Button for Sharing Text1 Word Card */
-		ShareCardBox shareCardBox = new ShareCardBox();
-		Button btnBDWordCard = new Button("Share!");
-		pane.add(btnBDWordCard, 4, 4, 1, 1);
-		btnBDWordCard.setOnAction(event -> {
-			if (user.getUsername() == null)
-				dialogueBox.displayAlertBox("Please Log in first!");
-			else if (DicTest.getqName() != null && text.get(0).getText() != null)
-				shareCardBox.display(DicTest.getqName(), text.get(0).getText(), user.getUsername(), server);
-		});
+		shareCardBox = new ShareCardBox();
+		Button btn1WordCard = new Button("Share!");
+		pane.add(btn1WordCard, 4, 4, 1, 1);
+		btn1WordCard.setOnAction(this);
 
 		/* Set Button for Sharing Text2 Word Card */
-		Button btnBYWordCard = new Button("Share!");
-		pane.add(btnBYWordCard, 4, 7, 1, 1);
-		btnBYWordCard.setOnAction(event -> {
-			if (user.getUsername() == null)
+		Button btn2WordCard = new Button("Share!");
+		pane.add(btn2WordCard, 4, 7, 1, 1);
+		btn2WordCard.setOnAction(event -> {
+			if (userHelper.isLogIn()) {
 				dialogueBox.displayAlertBox("Please Log in first!");
-			else if (DicTest.getqName() != null && text.get(1).getText() != null)
-				shareCardBox.display(DicTest.getqName(), text.get(1).getText(), user.getUsername(), server);
+				return;
+			}
+			if (textNotEmptyOrNull(inputWord.getText()) && textNotEmptyOrNull(textArea2.getText()))
+				shareCardBox.display(inputWord.getText(), textArea2.getText(), userHelper.getUserName(), server);
 		});
 
 		/* Set Button for Sharing Text3 Word Card */
-		Button btnYDWordCard = new Button("Share!");
-		pane.add(btnYDWordCard, 4, 10, 1, 1);
-		btnYDWordCard.setOnAction(event -> {
-			if (user.getUsername() == null)
+		Button btn3WordCard = new Button("Share!");
+		pane.add(btn3WordCard, 4, 10, 1, 1);
+		btn3WordCard.setOnAction(event -> {
+			if (userHelper.isLogIn())
 				dialogueBox.displayAlertBox("Please Log in first!");
-			else if (DicTest.getqName() != null && text.get(2).getText() != null)
-				shareCardBox.display(DicTest.getqName(), text.get(2).getText(), user.getUsername(), server);
+			else if (textNotEmptyOrNull(inputWord.getText()) && textNotEmptyOrNull(textArea3.getText()))
+				shareCardBox.display(inputWord.getText(), textArea3.getText(), userHelper.getUserName(), server);
 		});
 
+		/* Set the Stream */
+		InputStream is = null;
+		String path = System.getProperty("user.dir").replace("\\", "/");
 		/* Set Button for favors */
 		File fileEmpty = new File(path.concat("/images/Heart_empty.png"));
 		is = new FileInputStream(fileEmpty);
@@ -241,36 +222,43 @@ public class ApplicationUI extends Application {
 		is = new FileInputStream(filePadded);
 		Image HeartPadded = new Image(is);
 
-		ImageView heartViewBD = new ImageView();
-		ImageView heartViewBY = new ImageView();
-		ImageView heartViewYD = new ImageView();
-		btnFavorBD.setGraphic(heartViewBD);
-		btnFavorBY.setGraphic(heartViewBY);
-		btnFavorYD.setGraphic(heartViewYD);
-		heartViewBD.imageProperty()
-				.bind(Bindings.when(btnFavorBD.selectedProperty()).then(HeartPadded).otherwise(HeartEmpty));
-		heartViewBY.imageProperty()
-				.bind(Bindings.when(btnFavorBY.selectedProperty()).then(HeartPadded).otherwise(HeartEmpty));
-		heartViewYD.imageProperty()
-				.bind(Bindings.when(btnFavorYD.selectedProperty()).then(HeartPadded).otherwise(HeartEmpty));
+		ImageView heartView1 = new ImageView();
+		ImageView heartView2 = new ImageView();
+		ImageView heartView3 = new ImageView();
+		btnFavor1.setGraphic(heartView1);
+		btnFavor2.setGraphic(heartView2);
+		btnFavor3.setGraphic(heartView3);
+		heartView1.imageProperty()
+				.bind(Bindings.when(btnFavor1.selectedProperty()).then(HeartPadded).otherwise(HeartEmpty));
+		heartView2.imageProperty()
+				.bind(Bindings.when(btnFavor2.selectedProperty()).then(HeartPadded).otherwise(HeartEmpty));
+		heartView3.imageProperty()
+				.bind(Bindings.when(btnFavor3.selectedProperty()).then(HeartPadded).otherwise(HeartEmpty));
 		for (int i = 0; i < 3; i++) {
 			final int j = i;
 			btnFavor.get(j).setStyle("-fx-background-color: transparent");
 			pane.add(btnFavor.get(j), 4, i * 3 + 3, 1, 1);
-			btnFavor.get(j).setOnAction(event -> {
-				if (user.getUsername() == null) {
-					dialogueBox.displayAlertBox("Please Log in first!");
-					btnFavor.get(j).setSelected(false);
-				} else {
-					if (text.get(j) != null) {
-						if (btnFavor.get(j).isSelected())
-							user.addFavors(true, sortResult[j]);
-						else
-							user.addFavors(false, sortResult[j]);
-					}
-				}
-			});
+			btnFavor.get(j).setOnAction(this);
 		}
+
+		group1.setTextView(textArea1);
+		group1.setBtnWordCard(btn1WordCard);
+		group1.setBtnFavor(btnFavor1);
+		group1.setId(ID_BD);
+
+		group2.setTextView(textArea2);
+		group2.setBtnWordCard(btn2WordCard);
+		group2.setBtnFavor(btnFavor2);
+		group2.setId(ID_BY);
+
+		group3.setTextView(textArea3);
+		group3.setBtnWordCard(btn3WordCard);
+		group3.setBtnFavor(btnFavor3);
+		group3.setId(ID_YD);
+
+		group.add(group1);
+		group.add(group2);
+		group.add(group3);
 
 		/* Set Scene */
 		Scene scene = new Scene(pane, 500, 500);
@@ -285,7 +273,25 @@ public class ApplicationUI extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("iDictionary");
 		primaryStage.show();
-		
+
+	}
+
+	private void initCheckBox() {
+		checkBD = new CheckBox("BaiDu");
+		checkBY = new CheckBox("Bing");
+		checkYD = new CheckBox("YouDao");
+		checkBD.setId(ID_BD);
+		checkBY.setId(ID_BY);
+		checkYD.setId(ID_YD);
+		checkBD.setOnAction(this);
+		checkBY.setOnAction(this);
+		checkYD.setOnAction(this);
+
+		checkBD.setSelected(true);
+		checkBY.setSelected(true);
+		checkYD.setSelected(true);
+
+		dicHelper.setAll(true);
 
 	}
 
@@ -297,11 +303,187 @@ public class ApplicationUI extends Application {
 		ApplicationUI.server = server;
 	}
 
-	public static void main(String[] args) {
-		user = User.getInstance();
-		dicTest = new DicTest();
-		netStatus = new NetStatus();
-		launch(args);
+	public static ExecutorService getEs() {
+		return es;
 	}
+	
+	/**
+	 * ÖØÖÃ¿Ø¼þ
+	 */
+	private void reset() {
+		group.stream().forEach(action -> {
+			action.getTextView().clear();
+			action.getBtnFavor().setSelected(false);
+		});
+	}
+	
+	private boolean textNotEmptyOrNull(String text) {
+		return text != null && "".equals(text.trim());
+	}
+
+	@Override
+	public void handle(ActionEvent event) {
+		ButtonBase btn = (ButtonBase) event.getSource();
+		String id = btn.getId();
+		if (id == null)
+			return;
+		switch (id) {
+		case ID_BUTTON_SEARCH:
+			if ((inputWord.getText() != null && !inputWord.getText().isEmpty())) {
+				// DicHelper.setqName(inputWord.getText());
+				reset();
+
+				// if (!netStatus.isConnect()) {
+				// new DialogueBox().displayNetUnconnected();
+				// } else {
+				// System.out.println(System.currentTimeMillis() - start);
+				
+				if (userHelper.isLogIn()) {
+					List<FavorBean> sortResult = userHelper.getSortedList();
+					for (int i = 0; i < sortResult.size(); i++) {
+						group.get(i).setId(sortResult.get(i).getType());
+					}
+				}
+				dicHelper.getTrans(inputWord.getText());
+				/*if (userHelper.isLogIn()) {
+					userHelper.setDataType("Update");
+					// System.out.println(user.getYD());
+					if (es == null)
+						return;
+					//TODO es.execute(new ClientSocketSend<User>(user, server));
+				}*/
+			}
+			break;
+		case ID_BUTTON_SIGN:
+			try {
+				// Open Socket
+				server = new Socket("172.28.173.38", 12345);
+				if (es == null)
+					return;
+				es.execute(new ClientSocketReceive(es, server));
+				registerBox.show(server);
+				if (userHelper.isLogIn()) {
+					labelForUser.setText(userHelper.getUserName());
+					btnSign.setVisible(false);
+					labelForUser.setVisible(true);
+					btnLogout.setVisible(true);
+				} else
+					server.close();
+			} catch (Exception e) {
+				new DialogueBox().displayNetUnconnected();
+				// e.printStackTrace();
+			}
+			break;
+		case ID_BUTTON_EXIT:
+			try {
+				userHelper.setDataType("Logout");
+				// TODO DicTest.getEs().execute(new ClientSocketSend<User>(user,
+				// server));
+				ClientSocketSend.cnt = 0;
+				server.close();
+			} catch (Exception e) {
+				// e.printStackTrace();
+			}
+			userHelper.logOut();
+
+			break;
+		case ID_BD:
+			if (!((CheckBox) btn).isSelected())
+				dicHelper.setBDEnable(false);
+			else
+				dicHelper.setBDEnable(true);
+			break;
+		case ID_BY:
+			if (!((CheckBox) btn).isSelected())
+				dicHelper.setBYEnable(false);
+			else
+				dicHelper.setBYEnable(true);
+			break;
+		case ID_YD:
+			if (!((CheckBox) btn).isSelected())
+				dicHelper.setYDEnable(false);
+			else
+				dicHelper.setYDEnable(true);
+			break;
+		case ID_BUTTON_LIKE_BD:
+		case ID_BUTTON_LIKE_BY:
+		case ID_BUTTON_LIKE_YD:
+			userHelper.logIn("rhg", "123");
+			if (userHelper.isLogIn()) {
+				dialogueBox.displayAlertBox("Please Log in first!");
+				((ToggleButton) btn).setSelected(false);
+				return;
+			}
+			// System.out.println(group.stream().count());
+
+			group.stream().filter(obj -> obj.getBtnFavor().getId().equals(id)).forEach(action -> {
+				System.out.println("" + action.getTextView());
+				if (action.getTextView() != null) {
+					if (action.getBtnFavor().isSelected())
+						userHelper.addFavor(true, id);
+					else
+						userHelper.addFavor(false, id);
+
+				}
+			});
+			/*
+			 * if (user.getUsername() == null) { dialogueBox.displayAlertBox(
+			 * "Please Log in first!"); ((ToggleButton) btn).setSelected(false);
+			 * } else { if (textArea1 != null) { if (((ToggleButton)
+			 * btn).isSelected()) else userHelper.addFavor(false, id); } }
+			 */
+			break;
+		case ID_BUTTON_SHARE_BD:
+		case ID_BUTTON_SHARE_BY:
+		case ID_BUTTON_SHARE_YD:
+			if (userHelper.isLogIn()) {
+				dialogueBox.displayAlertBox("Please Log in first!");
+				return;
+			}
+			if (textNotEmptyOrNull(inputWord.getText()))
+				group.stream().filter(predicate -> predicate.getBtnWordCard().getId().equals(id)).forEach(action -> {
+					if (action.getTextView() != null)
+						shareCardBox.display(inputWord.getText(), action.getTextView().getText(),
+								userHelper.getUserName(), server);
+				});
+			break;
+		}
+	}
+
+	static ResultHook<IMessage> BDCallback = new ResultHook<IMessage>() {
+
+		@Override
+		public void result(IMessage result) {
+			group.stream().filter(predicate -> predicate.getId().equals(ID_BD)).forEach(action -> {
+				action.getTextView().setText("BDTrans:  " + result.getMsg());
+			});
+			System.out.println("BDTrans:  " + result.getMsg());
+
+		}
+	};
+	static ResultHook<IMessage> BYCallback = new ResultHook<IMessage>() {
+
+		@Override
+		public void result(IMessage result) {
+
+			group.stream().filter(predicate -> predicate.getId().equals(ID_BY)).forEach(action -> {
+				action.getTextView().setText("BYTrans:  " + result.getMsg());
+			});
+			System.out.println(result.getMsg());
+
+		}
+	};
+	static ResultHook<IMessage> YDCallback = new ResultHook<IMessage>() {
+
+		@Override
+		public void result(IMessage result) {
+
+			group.stream().filter(predicate -> predicate.getId().equals(ID_YD)).forEach(action -> {
+				action.getTextView().setText("YDTrans:  " + result.getMsg());
+			});
+			System.out.println(result.getMsg());
+
+		}
+	};
 
 }
