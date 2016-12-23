@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 
 import com.java.dictionary.bean.GroupBean;
 import com.java.dictionary.bean.FavorBean;
+import com.java.dictionary.common.Constant;
 import com.java.dictionary.common.IMessage;
 import com.java.dictionary.common.ResultHook;
 import com.java.dictionary.common.UserHelper;
@@ -51,15 +52,6 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 	private static final String ID_BUTTON_SIGN = "sign";
 	private static final String ID_BUTTON_SEARCH = "search";
 	private static final String ID_BUTTON_EXIT = "logout";
-	public static final String ID_BD = "BD";
-	public static final String ID_BY = "BY";
-	public static final String ID_YD = "YD";
-	public static final String ID_BUTTON_LIKE_BD = "LIKE_BD";
-	public static final String ID_BUTTON_LIKE_BY = "LIKE_BY";
-	public static final String ID_BUTTON_LIKE_YD = "LIKE_YD";
-	public static final String ID_BUTTON_SHARE_BD = "SHARE_BD";
-	public static final String ID_BUTTON_SHARE_BY = "SHARE_BY";
-	public static final String ID_BUTTON_SHARE_YD = "SHARE_YD";
 
 	static ExecutorService es;
 
@@ -131,7 +123,7 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 
 		/* Set Input Box */
 		inputWord = new TextField();
-		inputWord.setPromptText("Enter the word");
+		inputWord.setPromptText(Constant.INPUT_INFORM);
 		GridPane.setConstraints(inputWord, 0, 0, 3, 1);
 		pane.getChildren().add(inputWord);
 
@@ -142,7 +134,7 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 		pane.add(checkYD, 2, 1, 1, 1);
 
 		/* Set Search Button */
-		btnSearch = new Button("Search");
+		btnSearch = new Button(Constant.TEXT_SEARCH);
 		btnSearch.setId(ID_BUTTON_SEARCH);
 		btnSearch.setOnAction(this);
 		GridPane.setConstraints(btnSearch, 3, 0, 1, 1);
@@ -185,31 +177,19 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 
 		/* Set Button for Sharing Text1 Word Card */
 		shareCardBox = new ShareCardBox();
-		Button btn1WordCard = new Button("Share!");
+		Button btn1WordCard = new Button(Constant.TEXT_SHARE);
 		pane.add(btn1WordCard, 4, 4, 1, 1);
 		btn1WordCard.setOnAction(this);
 
 		/* Set Button for Sharing Text2 Word Card */
-		Button btn2WordCard = new Button("Share!");
+		Button btn2WordCard = new Button(Constant.TEXT_SHARE);
 		pane.add(btn2WordCard, 4, 7, 1, 1);
-		btn2WordCard.setOnAction(event -> {
-			if (userHelper.isLogIn()) {
-				dialogueBox.displayAlertBox("Please Log in first!");
-				return;
-			}
-			if (textNotEmptyOrNull(inputWord.getText()) && textNotEmptyOrNull(textArea2.getText()))
-				shareCardBox.display(inputWord.getText(), textArea2.getText(), userHelper.getUserName(), server);
-		});
+		btn2WordCard.setOnAction(this);
 
 		/* Set Button for Sharing Text3 Word Card */
-		Button btn3WordCard = new Button("Share!");
+		Button btn3WordCard = new Button(Constant.TEXT_SHARE);
 		pane.add(btn3WordCard, 4, 10, 1, 1);
-		btn3WordCard.setOnAction(event -> {
-			if (userHelper.isLogIn())
-				dialogueBox.displayAlertBox("Please Log in first!");
-			else if (textNotEmptyOrNull(inputWord.getText()) && textNotEmptyOrNull(textArea3.getText()))
-				shareCardBox.display(inputWord.getText(), textArea3.getText(), userHelper.getUserName(), server);
-		});
+		btn3WordCard.setOnAction(this);
 
 		/* Set the Stream */
 		InputStream is = null;
@@ -244,17 +224,17 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 		group1.setTextView(textArea1);
 		group1.setBtnWordCard(btn1WordCard);
 		group1.setBtnFavor(btnFavor1);
-		group1.setId(ID_BD);
+		group1.setId(Constant.ID_BD);
 
 		group2.setTextView(textArea2);
 		group2.setBtnWordCard(btn2WordCard);
 		group2.setBtnFavor(btnFavor2);
-		group2.setId(ID_BY);
+		group2.setId(Constant.ID_BY);
 
 		group3.setTextView(textArea3);
 		group3.setBtnWordCard(btn3WordCard);
 		group3.setBtnFavor(btnFavor3);
-		group3.setId(ID_YD);
+		group3.setId(Constant.ID_YD);
 
 		group.add(group1);
 		group.add(group2);
@@ -271,7 +251,7 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 
 		/* Set Stage */
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("iDictionary");
+		primaryStage.setTitle(Constant.TITLE);
 		primaryStage.show();
 
 	}
@@ -280,9 +260,9 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 		checkBD = new CheckBox("BaiDu");
 		checkBY = new CheckBox("Bing");
 		checkYD = new CheckBox("YouDao");
-		checkBD.setId(ID_BD);
-		checkBY.setId(ID_BY);
-		checkYD.setId(ID_YD);
+		checkBD.setId(Constant.ID_BD);
+		checkBY.setId(Constant.ID_BY);
+		checkYD.setId(Constant.ID_YD);
 		checkBD.setOnAction(this);
 		checkBY.setOnAction(this);
 		checkYD.setOnAction(this);
@@ -306,7 +286,7 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 	public static ExecutorService getEs() {
 		return es;
 	}
-	
+
 	/**
 	 * ÖØÖÃ¿Ø¼þ
 	 */
@@ -316,9 +296,9 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 			action.getBtnFavor().setSelected(false);
 		});
 	}
-	
-	private boolean textNotEmptyOrNull(String text) {
-		return text != null && "".equals(text.trim());
+
+	private boolean textNotEmpty(String text) {
+		return text != null && !"".equals(text.trim());
 	}
 
 	@Override
@@ -337,7 +317,7 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 				// new DialogueBox().displayNetUnconnected();
 				// } else {
 				// System.out.println(System.currentTimeMillis() - start);
-				
+
 				if (userHelper.isLogIn()) {
 					List<FavorBean> sortResult = userHelper.getSortedList();
 					for (int i = 0; i < sortResult.size(); i++) {
@@ -345,13 +325,12 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 					}
 				}
 				dicHelper.getTrans(inputWord.getText());
-				/*if (userHelper.isLogIn()) {
-					userHelper.setDataType("Update");
-					// System.out.println(user.getYD());
-					if (es == null)
-						return;
-					//TODO es.execute(new ClientSocketSend<User>(user, server));
-				}*/
+				/*
+				 * if (userHelper.isLogIn()) { userHelper.setDataType("Update");
+				 * // System.out.println(user.getYD()); if (es == null) return;
+				 * //TODO es.execute(new ClientSocketSend<User>(user, server));
+				 * }
+				 */
 			}
 			break;
 		case ID_BUTTON_SIGN:
@@ -387,29 +366,29 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 			userHelper.logOut();
 
 			break;
-		case ID_BD:
+		case Constant.ID_BD:
 			if (!((CheckBox) btn).isSelected())
 				dicHelper.setBDEnable(false);
 			else
 				dicHelper.setBDEnable(true);
 			break;
-		case ID_BY:
+		case Constant.ID_BY:
 			if (!((CheckBox) btn).isSelected())
 				dicHelper.setBYEnable(false);
 			else
 				dicHelper.setBYEnable(true);
 			break;
-		case ID_YD:
+		case Constant.ID_YD:
 			if (!((CheckBox) btn).isSelected())
 				dicHelper.setYDEnable(false);
 			else
 				dicHelper.setYDEnable(true);
 			break;
-		case ID_BUTTON_LIKE_BD:
-		case ID_BUTTON_LIKE_BY:
-		case ID_BUTTON_LIKE_YD:
-			userHelper.logIn("rhg", "123");
-			if (userHelper.isLogIn()) {
+		case Constant.ID_BUTTON_LIKE_BD:
+		case Constant.ID_BUTTON_LIKE_BY:
+		case Constant.ID_BUTTON_LIKE_YD:
+			// userHelper.logIn("rhg", "123");
+			if (!userHelper.isLogIn()) {
 				dialogueBox.displayAlertBox("Please Log in first!");
 				((ToggleButton) btn).setSelected(false);
 				return;
@@ -426,26 +405,26 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 
 				}
 			});
-			/*
-			 * if (user.getUsername() == null) { dialogueBox.displayAlertBox(
-			 * "Please Log in first!"); ((ToggleButton) btn).setSelected(false);
-			 * } else { if (textArea1 != null) { if (((ToggleButton)
-			 * btn).isSelected()) else userHelper.addFavor(false, id); } }
-			 */
 			break;
-		case ID_BUTTON_SHARE_BD:
-		case ID_BUTTON_SHARE_BY:
-		case ID_BUTTON_SHARE_YD:
-			if (userHelper.isLogIn()) {
+		case Constant.ID_BUTTON_SHARE_BD:
+		case Constant.ID_BUTTON_SHARE_BY:
+		case Constant.ID_BUTTON_SHARE_YD:
+//			userHelper.logIn("rhg", "123");
+			if (!userHelper.isLogIn()) {
 				dialogueBox.displayAlertBox("Please Log in first!");
 				return;
 			}
-			if (textNotEmptyOrNull(inputWord.getText()))
+			if (textNotEmpty(inputWord.getText()))
 				group.stream().filter(predicate -> predicate.getBtnWordCard().getId().equals(id)).forEach(action -> {
-					if (action.getTextView() != null)
-						shareCardBox.display(inputWord.getText(), action.getTextView().getText(),
-								userHelper.getUserName(), server);
+					if (!textNotEmpty(action.getTextView().getText())){
+						System.out.println(action.getTextView().getText());
+						dialogueBox.displayAlertBox("Content is empty");
+						return;
+					}
+					shareCardBox.display(inputWord.getText(), action.getTextView().getText(), userHelper.getUserName(),
+							server);
 				});
+			else dialogueBox.displayAlertBox("Content is empty");
 			break;
 		}
 	}
@@ -454,10 +433,9 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 
 		@Override
 		public void result(IMessage result) {
-			group.stream().filter(predicate -> predicate.getId().equals(ID_BD)).forEach(action -> {
+			group.stream().filter(predicate -> predicate.getId().equals(Constant.ID_BD)).forEach(action -> {
 				action.getTextView().setText("BDTrans:  " + result.getMsg());
 			});
-			System.out.println("BDTrans:  " + result.getMsg());
 
 		}
 	};
@@ -466,10 +444,9 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 		@Override
 		public void result(IMessage result) {
 
-			group.stream().filter(predicate -> predicate.getId().equals(ID_BY)).forEach(action -> {
+			group.stream().filter(predicate -> predicate.getId().equals(Constant.ID_BY)).forEach(action -> {
 				action.getTextView().setText("BYTrans:  " + result.getMsg());
 			});
-			System.out.println(result.getMsg());
 
 		}
 	};
@@ -478,10 +455,9 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 		@Override
 		public void result(IMessage result) {
 
-			group.stream().filter(predicate -> predicate.getId().equals(ID_YD)).forEach(action -> {
+			group.stream().filter(predicate -> predicate.getId().equals(Constant.ID_YD)).forEach(action -> {
 				action.getTextView().setText("YDTrans:  " + result.getMsg());
 			});
-			System.out.println(result.getMsg());
 
 		}
 	};

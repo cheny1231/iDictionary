@@ -1,11 +1,11 @@
 package com.java.dictionary;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.java.dictionary.bean.FavorBean;
+import com.java.dictionary.common.Constant;
 
 /**
  * User class to save the information of current user
@@ -56,9 +56,9 @@ public class UserDB implements Serializable {
 	}*/
 
 	private UserDB() {
-		FavorBean BDType = new FavorBean(ApplicationUI.ID_BD,0);
-		FavorBean BYType = new FavorBean(ApplicationUI.ID_BY,0);
-		FavorBean YDType = new FavorBean(ApplicationUI.ID_YD,0);
+		FavorBean BDType = new FavorBean(Constant.ID_BD,0);
+		FavorBean BYType = new FavorBean(Constant.ID_BY,0);
+		FavorBean YDType = new FavorBean(Constant.ID_YD,0);
 		likeList.add(BDType);
 		likeList.add(BYType);
 		likeList.add(YDType);
