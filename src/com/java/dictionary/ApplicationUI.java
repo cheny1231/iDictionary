@@ -244,7 +244,7 @@ public class ApplicationUI extends Application implements EventHandler<ActionEve
 		Scene scene = new Scene(pane, 500, 500);
 		File fileCss = new File(path.concat("/dark.css"));
 		is = new FileInputStream(fileCss);
-		scene.getStylesheets().add(fileCss.toURL().toExternalForm());
+		scene.getStylesheets().add(fileCss.toURI().toURL().toExternalForm());
 
 		/* Close the stream */
 		is.close();
